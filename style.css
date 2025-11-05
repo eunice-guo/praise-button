@@ -15,13 +15,27 @@ body {
     background-attachment: fixed;
 }
 
-/* Container to center button */
+/* Container to center content */
 .container {
     width: 100%;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 30px;
+}
+
+/* Tagline above button */
+.tagline {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 32px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0;
+    text-align: center;
+    letter-spacing: 1px;
 }
 
 /* Praise button - Glassmorphism style */
@@ -102,6 +116,10 @@ body {
 
 /* Desktop size adjustments */
 @media screen and (min-width: 768px) {
+    .tagline {
+        font-size: 42px;
+    }
+
     .praise-button {
         width: 165px;
         height: 165px;
@@ -110,6 +128,10 @@ body {
 
 /* Larger desktop screens */
 @media screen and (min-width: 1024px) {
+    .tagline {
+        font-size: 48px;
+    }
+
     .praise-button {
         width: 180px;
         height: 180px;
@@ -118,6 +140,10 @@ body {
 
 /* Small mobile devices */
 @media screen and (max-width: 360px) {
+    .tagline {
+        font-size: 28px;
+    }
+
     .praise-button {
         width: 120px;
         height: 120px;
