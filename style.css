@@ -10,8 +10,8 @@ body {
     width: 100%;
     height: 100vh;
     overflow: hidden;
-    /* Warm gradient background (peach → pink → orange) */
-    background: linear-gradient(135deg, #FFE5D4 0%, #FFB6C1 50%, #FFB347 100%);
+    /* Soft beige background */
+    background: #F5E6D3;
     background-attachment: fixed;
 }
 
@@ -23,7 +23,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 60px; /* Moved text further up */
 }
 
 /* Tagline above button */
@@ -31,11 +31,21 @@ body {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 32px;
     font-weight: normal;
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    color: rgba(139, 90, 60, 0.85); /* Warm brown for beige bg */
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
     margin: 0;
     text-align: center;
     letter-spacing: 1px;
+}
+
+/* Floating animation for button */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 /* Praise button - Glassmorphism style */
@@ -46,13 +56,13 @@ body {
     border-radius: 50%;
 
     /* Glassmorphism effect */
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px); /* Safari support */
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.1),
-        inset 0 0 20px rgba(255, 255, 255, 0.3);
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        inset 0 0 20px rgba(255, 255, 255, 0.4);
 
     /* Remove default button styles */
     outline: none;
@@ -68,44 +78,48 @@ body {
 
     /* Touch optimization */
     -webkit-tap-highlight-color: transparent;
+
+    /* Floating animation */
+    animation: float 3s ease-in-out infinite;
 }
 
 /* Hover effect (desktop only) */
 @media (hover: hover) {
     .praise-button:hover {
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.35);
         box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.15),
-            inset 0 0 20px rgba(255, 255, 255, 0.4),
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            inset 0 0 20px rgba(255, 255, 255, 0.5),
             0 0 30px rgba(255, 255, 255, 0.3);
-        transform: scale(1.02);
+        transform: translateY(-12px) scale(1.02);
+        animation: none; /* Stop float on hover */
     }
 }
 
 /* Active state */
 .praise-button:active {
-    transform: scale(0.98);
+    transform: translateY(0px) scale(0.98);
 }
 
 /* Glow/pulse animation when clicked */
 @keyframes glow-pulse {
     0% {
         box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.1),
-            inset 0 0 20px rgba(255, 255, 255, 0.3),
-            0 0 0 0 rgba(255, 255, 255, 0.7);
+            0 8px 32px rgba(0, 0, 0, 0.08),
+            inset 0 0 20px rgba(255, 255, 255, 0.4),
+            0 0 0 0 rgba(255, 200, 150, 0.7);
     }
     50% {
         box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.15),
-            inset 0 0 30px rgba(255, 255, 255, 0.5),
-            0 0 40px 20px rgba(255, 255, 255, 0);
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            inset 0 0 30px rgba(255, 255, 255, 0.6),
+            0 0 40px 20px rgba(255, 200, 150, 0);
     }
     100% {
         box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.1),
-            inset 0 0 20px rgba(255, 255, 255, 0.3),
-            0 0 0 0 rgba(255, 255, 255, 0);
+            0 8px 32px rgba(0, 0, 0, 0.08),
+            inset 0 0 20px rgba(255, 255, 255, 0.4),
+            0 0 0 0 rgba(255, 200, 150, 0);
     }
 }
 
@@ -116,6 +130,10 @@ body {
 
 /* Desktop size adjustments */
 @media screen and (min-width: 768px) {
+    .container {
+        gap: 80px; /* More space on desktop */
+    }
+
     .tagline {
         font-size: 42px;
     }
@@ -128,6 +146,10 @@ body {
 
 /* Larger desktop screens */
 @media screen and (min-width: 1024px) {
+    .container {
+        gap: 100px;
+    }
+
     .tagline {
         font-size: 48px;
     }
@@ -140,6 +162,10 @@ body {
 
 /* Small mobile devices */
 @media screen and (max-width: 360px) {
+    .container {
+        gap: 50px;
+    }
+
     .tagline {
         font-size: 28px;
     }
