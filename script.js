@@ -1,24 +1,20 @@
 // Praise Machine Button - JavaScript
 
-// Initialize audio
-const audio = new Audio('./assets/audio.mp3');
-
-// Preload audio for faster playback
-audio.preload = 'auto';
+// Array of encouragement phrases
+const phrases = [
+    './assets/phrase1.mp3', // "You did a great job!"
+    './assets/phrase2.mp3', // "You are so amazing!"
+    './assets/phrase3.mp3', // "So proud of you!"
+    './assets/phrase4.mp3'  // "Wow you are a genius!"
+];
 
 // Get button element
 const button = document.querySelector('.praise-button');
 
-// Handle audio loading errors
-audio.addEventListener('error', (e) => {
-    console.warn('Audio file not found or failed to load. Please add audio.mp3 to the assets folder.');
-    console.warn('Download a free ding sound from: https://pixabay.com/sound-effects/search/ding/');
-});
-
 // Click handler function
 function handleClick() {
-    // 1. Play audio
-    playAudio();
+    // 1. Play random audio phrase
+    playRandomPhrase();
 
     // 2. Trigger glow/pulse animation
     triggerAnimation();
@@ -27,11 +23,15 @@ function handleClick() {
     triggerVibration();
 }
 
-// Play audio with reset for rapid clicks
-function playAudio() {
+// Play random encouragement phrase
+function playRandomPhrase() {
     try {
-        // Reset audio to beginning for rapid replay support
-        audio.currentTime = 0;
+        // Select random phrase
+        const randomIndex = Math.floor(Math.random() * phrases.length);
+        const selectedPhrase = phrases[randomIndex];
+
+        // Create new audio object for selected phrase
+        const audio = new Audio(selectedPhrase);
 
         // Play audio
         audio.play().catch(err => {
@@ -84,4 +84,4 @@ button.addEventListener('touchend', (e) => {
 
 // Log ready state
 console.log('Praise Machine Button initialized! 🎉');
-console.log('Click the button for encouragement!');
+console.log(`Loaded ${phrases.length} encouragement phrases!`);
