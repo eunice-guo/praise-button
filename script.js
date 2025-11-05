@@ -19,11 +19,62 @@ function handleClick() {
     // 1. Play random audio phrase (different from last)
     playRandomPhrase();
 
-    // 2. Trigger glow/pulse animation
+    // 2. Trigger star particles burst
+    createStarBurst();
+
+    // 3. Trigger glow/pulse animation
     triggerAnimation();
 
-    // 3. Trigger vibration (mobile only)
+    // 4. Trigger vibration (mobile only)
     triggerVibration();
+}
+
+// Create star particles burst effect
+function createStarBurst() {
+    // Number of stars to create (5-8)
+    const starCount = Math.floor(Math.random() * 4) + 5; // Random between 5-8
+
+    // Get button position and center point
+    const buttonRect = button.getBoundingClientRect();
+    const centerX = buttonRect.left + buttonRect.width / 2;
+    const centerY = buttonRect.top + buttonRect.height / 2;
+
+    for (let i = 0; i < starCount; i++) {
+        createStar(centerX, centerY);
+    }
+}
+
+// Create individual star particle
+function createStar(centerX, centerY) {
+    const star = document.createElement('div');
+    star.className = 'star-particle';
+    star.textContent = '⭐';
+
+    // Random angle for spread (0-360 degrees)
+    const angle = Math.random() * Math.PI * 2;
+
+    // Random distance (50-100px)
+    const distance = Math.random() * 50 + 50;
+
+    // Calculate end position
+    const endX = Math.cos(angle) * distance;
+    const endY = Math.sin(angle) * distance;
+
+    // Set CSS custom properties for animation
+    star.style.setProperty('--end-x', `${endX}px`);
+    star.style.setProperty('--end-y', `${endY}px`);
+
+    // Position star at button center (relative to viewport)
+    star.style.left = `${centerX}px`;
+    star.style.top = `${centerY}px`;
+
+    // Add to page
+    document.body.appendChild(star);
+
+    // Remove star after animation completes (1 second)
+    setTimeout(() => {
+        star.remove();
+    }, 1000);
 }
 
 // Play random encouragement phrase (no repeats)

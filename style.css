@@ -29,13 +29,45 @@ body {
 /* Tagline above button - smaller size */
 .tagline {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 24px; /* Reduced from 32px */
+    font-size: 24px;
     font-weight: normal;
     color: rgba(139, 90, 60, 0.85);
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
     margin: 0;
     text-align: center;
     letter-spacing: 1px;
+}
+
+/* Star particle styles */
+.star-particle {
+    position: fixed;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 1000;
+    animation: star-burst 1s ease-out forwards;
+    transform-origin: center;
+}
+
+/* Star burst animation */
+@keyframes star-burst {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(
+            calc(-50% + var(--end-x) * 0.7),
+            calc(-50% + var(--end-y) * 0.7)
+        ) scale(1) rotate(180deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(
+            calc(-50% + var(--end-x)),
+            calc(-50% + var(--end-y))
+        ) scale(0.3) rotate(360deg);
+    }
 }
 
 /* Floating animation for button */
@@ -101,25 +133,28 @@ body {
     transform: translateY(0px) scale(0.98);
 }
 
-/* Glow/pulse animation when clicked */
+/* Enhanced glow/pulse animation when clicked */
 @keyframes glow-pulse {
     0% {
         box-shadow:
             0 8px 32px rgba(0, 0, 0, 0.08),
             inset 0 0 20px rgba(255, 255, 255, 0.4),
-            0 0 0 0 rgba(255, 200, 150, 0.7);
+            0 0 0 0 rgba(255, 200, 100, 0.9);
     }
     50% {
         box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            inset 0 0 30px rgba(255, 255, 255, 0.6),
-            0 0 40px 20px rgba(255, 200, 150, 0);
+            0 8px 40px rgba(255, 200, 100, 0.4),
+            inset 0 0 40px rgba(255, 255, 255, 0.8),
+            0 0 60px 30px rgba(255, 200, 100, 0.6),
+            0 0 100px 50px rgba(255, 220, 150, 0.3);
+        transform: scale(1.05);
     }
     100% {
         box-shadow:
             0 8px 32px rgba(0, 0, 0, 0.08),
             inset 0 0 20px rgba(255, 255, 255, 0.4),
-            0 0 0 0 rgba(255, 200, 150, 0);
+            0 0 0 0 rgba(255, 200, 100, 0);
+        transform: scale(1);
     }
 }
 
@@ -135,12 +170,16 @@ body {
     }
 
     .tagline {
-        font-size: 28px; /* Reduced from 42px */
+        font-size: 28px;
     }
 
     .praise-button {
         width: 165px;
         height: 165px;
+    }
+
+    .star-particle {
+        font-size: 24px;
     }
 }
 
@@ -151,12 +190,16 @@ body {
     }
 
     .tagline {
-        font-size: 32px; /* Reduced from 48px */
+        font-size: 32px;
     }
 
     .praise-button {
         width: 180px;
         height: 180px;
+    }
+
+    .star-particle {
+        font-size: 28px;
     }
 }
 
@@ -167,11 +210,15 @@ body {
     }
 
     .tagline {
-        font-size: 20px; /* Reduced from 28px */
+        font-size: 20px;
     }
 
     .praise-button {
         width: 120px;
         height: 120px;
+    }
+
+    .star-particle {
+        font-size: 18px;
     }
 }
