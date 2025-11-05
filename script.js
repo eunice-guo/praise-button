@@ -8,12 +8,15 @@ const phrases = [
     './assets/phrase4.mp3'  // "Wow you are a genius!"
 ];
 
+// Track last played phrase to avoid repetition
+let lastPlayedIndex = -1;
+
 // Get button element
 const button = document.querySelector('.praise-button');
 
 // Click handler function
 function handleClick() {
-    // 1. Play random audio phrase
+    // 1. Play random audio phrase (different from last)
     playRandomPhrase();
 
     // 2. Trigger glow/pulse animation
@@ -23,11 +26,24 @@ function handleClick() {
     triggerVibration();
 }
 
-// Play random encouragement phrase
+// Play random encouragement phrase (no repeats)
 function playRandomPhrase() {
     try {
-        // Select random phrase
-        const randomIndex = Math.floor(Math.random() * phrases.length);
+        let randomIndex;
+
+        // If there's only one phrase, just play it
+        if (phrases.length === 1) {
+            randomIndex = 0;
+        } else {
+            // Keep selecting until we get a different phrase
+            do {
+                randomIndex = Math.floor(Math.random() * phrases.length);
+            } while (randomIndex === lastPlayedIndex);
+        }
+
+        // Update last played index
+        lastPlayedIndex = randomIndex;
+
         const selectedPhrase = phrases[randomIndex];
 
         // Create new audio object for selected phrase
@@ -84,4 +100,4 @@ button.addEventListener('touchend', (e) => {
 
 // Log ready state
 console.log('Praise Machine Button initialized! 🎉');
-console.log(`Loaded ${phrases.length} encouragement phrases!`);
+console.log(`Loaded ${phrases.length} encouragement phrases (no repeats)!`);
