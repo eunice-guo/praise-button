@@ -1,0 +1,22 @@
+📢 AUDIO FILE NEEDED 📢
+
+Please add your audio file here as: audio.mp3
+
+Where to get free audio:
+1. Pixabay: https://pixabay.com/sound-effects/search/ding/
+2. Freesound: https://freesound.org/
+3. Mixkit: https://mixkit.co/free-sound-effects/
+
+Requirements:
+- Format: MP3
+- Size: < 500KB recommended
+- Duration: 1-2 seconds
+- Type: Cheerful "ding" or encouragement sound
+
+After downloading:
+1. Rename to: audio.mp3
+2. Place in this folder (assets/)
+3. Refresh your browser
+
+The button will work without audio (animation and vibration only),
+but you'll see a console warning until audio.mp3 is added.
