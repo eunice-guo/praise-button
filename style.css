@@ -103,13 +103,12 @@ body {
 .tab-content-wrapper {
     width: 100%;
     min-height: 100vh;
-    padding-top: 140px;
 }
 
 .tab-content {
     display: none;
     width: 100%;
-    min-height: calc(100vh - 140px);
+    min-height: 100vh;
 }
 
 .tab-content.active {
@@ -120,13 +119,14 @@ body {
 /* Container to center content */
 .container {
     width: 100%;
-    height: calc(100vh - 140px);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 40px;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 /* Tagline above button */
@@ -351,7 +351,7 @@ body {
 .calendar-container {
     max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 140px 20px 40px 20px;
 }
 
 .calendar-header {
@@ -459,7 +459,7 @@ body {
 .diary-container {
     max-width: 700px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 140px 20px 40px 20px;
 }
 
 .diary-title {
