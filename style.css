@@ -8,11 +8,16 @@
 body {
     font-family: Georgia, 'Times New Roman', serif;
     width: 100%;
+    min-width: 100%;
     height: 100vh;
+    min-height: 100vh;
     overflow-x: hidden;
     /* Soft beige background */
     background: #F5E6D3;
     background-attachment: fixed;
+    /* Prevent text size adjustment on iOS */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 /* ============= LANGUAGE SWITCH ============= */
@@ -736,10 +741,111 @@ body {
     }
 }
 
+/* iPhone and mobile devices - ensure proper fit */
+@media screen and (max-width: 480px) {
+    .container {
+        gap: 30px;
+        padding: 120px 15px 20px 15px;
+        padding-top: max(120px, env(safe-area-inset-top, 0px) + 100px);
+    }
+
+    .nav-tabs {
+        top: 60px;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .tab-btn {
+        font-size: 13px;
+        padding: 6px 10px;
+        min-width: 65px;
+    }
+
+    .calendar-container {
+        padding: 120px 15px 30px 15px;
+        padding-top: max(120px, env(safe-area-inset-top, 0px) + 100px);
+    }
+
+    .calendar-header {
+        margin-bottom: 20px;
+    }
+
+    .calendar-title {
+        font-size: 20px;
+    }
+
+    .calendar-weekdays {
+        gap: 8px;
+    }
+
+    .calendar-weekdays > div {
+        font-size: 12px;
+        padding: 8px 0;
+    }
+
+    .calendar-grid {
+        gap: 8px;
+    }
+
+    .calendar-day {
+        font-size: 14px;
+    }
+
+    .day-number {
+        font-size: 12px;
+    }
+
+    .day-fire {
+        font-size: 14px;
+    }
+
+    .diary-container {
+        padding: 120px 15px 30px 15px;
+        padding-top: max(120px, env(safe-area-inset-top, 0px) + 100px);
+    }
+
+    .diary-title {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .diary-note {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .diary-input-section {
+        padding: 18px;
+        margin-bottom: 30px;
+    }
+
+    .diary-textarea {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 100px;
+    }
+
+    .diary-buttons {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .diary-btn {
+        font-size: 14px;
+        padding: 10px 20px;
+        flex: 1;
+        min-width: 80px;
+    }
+}
+
 /* Small mobile devices */
 @media screen and (max-width: 360px) {
     .container {
-        gap: 30px;
+        gap: 25px;
+        padding: 110px 12px 20px 12px;
     }
 
     .tagline {
@@ -779,14 +885,14 @@ body {
     }
 
     .nav-tabs {
-        gap: 20px;
-        top: 60px;
+        gap: 12px;
+        top: 55px;
     }
 
     .tab-btn {
-        font-size: 13px;
+        font-size: 12px;
         padding: 6px 8px;
-        min-width: 70px;
+        min-width: 60px;
     }
 
     .streak-display {
@@ -797,24 +903,66 @@ body {
         min-width: 140px;
     }
 
+    .calendar-container {
+        padding: 110px 12px 25px 12px;
+    }
+
     .calendar-grid {
         gap: 6px;
     }
 
     .day-number {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .day-fire {
-        font-size: 14px;
+        font-size: 12px;
+    }
+
+    .diary-container {
+        padding: 110px 12px 25px 12px;
     }
 
     .diary-input-section {
-        padding: 18px;
+        padding: 15px;
     }
 
     .diary-textarea {
-        padding: 12px;
-        font-size: 14px;
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+/* iPhone specific - safe area support for notched devices */
+@supports (padding: max(0px)) {
+    .lang-switch {
+        top: max(20px, env(safe-area-inset-top) + 10px);
+        right: max(20px, env(safe-area-inset-right) + 10px);
+    }
+
+    .nav-tabs {
+        top: max(70px, env(safe-area-inset-top) + 50px);
+    }
+
+    .container {
+        padding-top: max(120px, env(safe-area-inset-top) + 100px);
+    }
+
+    .calendar-container,
+    .diary-container {
+        padding-top: max(120px, env(safe-area-inset-top) + 100px);
+    }
+}
+
+/* Prevent horizontal scrolling on iPhone */
+@media screen and (max-width: 480px) {
+    body {
+        overflow-x: hidden;
+        position: relative;
+        width: 100%;
+    }
+
+    html {
+        overflow-x: hidden;
     }
 }
