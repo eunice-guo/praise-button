@@ -157,8 +157,19 @@ function init() {
     // Initialize calendar
     renderCalendar();
     
-    // Initialize weekday labels with spans
-    updateWeekdayLabels();
+    // Initialize weekday labels with spans (only once)
+    // Don't call updateWeekdayLabels here as it's called on language change
+    // The HTML already has spans, so we just need to set initial text
+    const weekdayDivs = document.querySelectorAll('.calendar-weekdays > div');
+    weekdayDivs.forEach(div => {
+        const text = div.getAttribute(`data-${currentLanguage}`);
+        if (text) {
+            let textSpan = div.querySelector('span');
+            if (textSpan) {
+                textSpan.textContent = text;
+            }
+        }
+    });
     
     // Initialize tab buttons with spans
     updateTabLanguage();
@@ -716,13 +727,16 @@ function updateWeekdayLabels() {
     weekdayDivs.forEach(div => {
         const text = div.getAttribute(`data-${currentLanguage}`);
         if (text) {
-            // Wrap text in a span to maintain consistent sizing
+            // Get or create span, but only update text once
             let textSpan = div.querySelector('span');
             if (!textSpan) {
                 textSpan = document.createElement('span');
                 div.appendChild(textSpan);
             }
-            textSpan.textContent = text;
+            // Only update if text is different to avoid duplication
+            if (textSpan.textContent !== text) {
+                textSpan.textContent = text;
+            }
         }
     });
 }
