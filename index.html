@@ -71,8 +71,8 @@
     <nav class="nav-tabs">
         <button class="tab-btn active" data-tab="button" data-en="Button" data-zh="按钮"><span class="tab-btn-text">Button</span></button>
         <button class="tab-btn" data-tab="calendar" data-en="Calendar" data-zh="日历"><span class="tab-btn-text">Calendar</span></button>
-        <button class="tab-btn" data-tab="gratitude" data-en="Gratitude Diary" data-zh="感恩日记"><span class="tab-btn-text">Gratitude Diary</span></button>
-        <button class="tab-btn" data-tab="firelog" data-en="My Fire Log" data-zh="我的成就记录"><span class="tab-btn-text">My Fire Log</span></button>
+        <button class="tab-btn" data-tab="friends" data-en="Friends" data-zh="好友"><span class="tab-btn-text">Friends</span></button>
+        <button class="tab-btn" data-tab="account" data-en="Account" data-zh="账户"><span class="tab-btn-text">Account</span></button>
     </nav>
 
     <!-- Tab Content -->
@@ -123,53 +123,111 @@
             </div>
         </div>
 
-        <!-- Gratitude Diary Tab -->
-        <div class="tab-content" id="gratitude-tab">
-            <div class="diary-container">
-                <h2 class="diary-title" data-en="Gratitude Diary" data-zh="感恩日记">Gratitude Diary</h2>
-                <p class="diary-note" data-en="What are you grateful for today?" data-zh="今天你想感恩什么？">
-                    What are you grateful for today?
+        <!-- Friends Tab -->
+        <div class="tab-content" id="friends-tab">
+            <div class="friends-container">
+                <h2 class="friends-title" data-en="Friends" data-zh="好友">Friends</h2>
+                <p class="friends-note" data-en="Connect with friends and see their streaks!" data-zh="添加好友，查看他们的打卡记录！">
+                    Connect with friends and see their streaks!
                 </p>
-                <div class="diary-input-section">
-                    <textarea class="diary-textarea" id="gratitudeInput"
-                              data-placeholder-en="What are you grateful for today?"
-                              data-placeholder-zh="今天你想感恩什么？"
-                              placeholder="What are you grateful for today?"
-                              rows="4"></textarea>
-                    <div class="diary-buttons">
-                        <button class="diary-btn save-btn" id="saveGratitude" data-en="Save" data-zh="保存"><span class="diary-btn-text">Save</span></button>
-                        <button class="diary-btn cancel-btn" id="cancelGratitude" data-en="Cancel" data-zh="取消"><span class="diary-btn-text">Cancel</span></button>
-                    </div>
+
+                <!-- Add Friend Section -->
+                <div class="add-friend-section">
+                    <input type="text" class="friend-input" id="friendUsernameInput"
+                           data-placeholder-en="Enter friend's username"
+                           data-placeholder-zh="输入好友用户名"
+                           placeholder="Enter friend's username">
+                    <button class="friend-btn add-friend-btn" id="addFriendBtn" data-en="Add Friend" data-zh="添加好友">
+                        <span class="friend-btn-text">Add Friend</span>
+                    </button>
                 </div>
-                <h3 class="past-entries-title" data-en="Past Entries" data-zh="历史记录">Past Entries</h3>
-                <div class="past-entries" id="gratitudeEntries">
-                    <!-- Past gratitude entries will be shown here -->
+
+                <!-- Friends List -->
+                <h3 class="friends-list-title" data-en="Your Friends" data-zh="我的好友">Your Friends</h3>
+                <div class="friends-list" id="friendsList">
+                    <!-- Friends will be displayed here -->
                 </div>
             </div>
         </div>
 
-        <!-- Fire Log Tab -->
-        <div class="tab-content" id="firelog-tab">
-            <div class="diary-container">
-                <h2 class="diary-title" data-en="My Fire Log" data-zh="我的成就记录">My Fire Log</h2>
-                <p class="diary-note" data-en="Record what you achieved today and what you're proud of!"
-                   data-zh="记录今天的成就和让你骄傲的事！">
-                    Record what you achieved today and what you're proud of!
-                </p>
-                <div class="diary-input-section">
-                    <textarea class="diary-textarea" id="firelogInput"
-                              data-placeholder-en="What did you achieve today? What are you proud of?"
-                              data-placeholder-zh="今天你取得了什么成就？有什么让你骄傲的？"
-                              placeholder="What did you achieve today? What are you proud of?"
-                              rows="4"></textarea>
-                    <div class="diary-buttons">
-                        <button class="diary-btn save-btn" id="saveFirelog" data-en="Save" data-zh="保存"><span class="diary-btn-text">Save</span></button>
-                        <button class="diary-btn cancel-btn" id="cancelFirelog" data-en="Cancel" data-zh="取消"><span class="diary-btn-text">Cancel</span></button>
+        <!-- Account Tab -->
+        <div class="tab-content" id="account-tab">
+            <div class="account-container">
+                <!-- Login/Signup Form (shown when not logged in) -->
+                <div class="auth-section" id="authSection">
+                    <h2 class="auth-title" data-en="Welcome!" data-zh="欢迎！">Welcome!</h2>
+
+                    <!-- Login Form -->
+                    <div class="auth-form" id="loginForm">
+                        <h3 class="auth-subtitle" data-en="Login" data-zh="登录">Login</h3>
+                        <input type="text" class="auth-input" id="loginUsername"
+                               data-placeholder-en="Username"
+                               data-placeholder-zh="用户名"
+                               placeholder="Username">
+                        <input type="password" class="auth-input" id="loginPassword"
+                               data-placeholder-en="Password"
+                               data-placeholder-zh="密码"
+                               placeholder="Password">
+                        <button class="auth-btn" id="loginBtn" data-en="Login" data-zh="登录">
+                            <span class="auth-btn-text">Login</span>
+                        </button>
+                        <p class="auth-switch-text">
+                            <span data-en="Don't have an account?" data-zh="还没有账户？">Don't have an account?</span>
+                            <a href="#" id="showSignup" data-en="Sign up" data-zh="注册">Sign up</a>
+                        </p>
+                    </div>
+
+                    <!-- Signup Form -->
+                    <div class="auth-form hidden" id="signupForm">
+                        <h3 class="auth-subtitle" data-en="Sign Up" data-zh="注册">Sign Up</h3>
+                        <input type="text" class="auth-input" id="signupUsername"
+                               data-placeholder-en="Username"
+                               data-placeholder-zh="用户名"
+                               placeholder="Username">
+                        <input type="email" class="auth-input" id="signupEmail"
+                               data-placeholder-en="Email"
+                               data-placeholder-zh="邮箱"
+                               placeholder="Email">
+                        <input type="password" class="auth-input" id="signupPassword"
+                               data-placeholder-en="Password"
+                               data-placeholder-zh="密码"
+                               placeholder="Password">
+                        <button class="auth-btn" id="signupBtn" data-en="Sign Up" data-zh="注册">
+                            <span class="auth-btn-text">Sign Up</span>
+                        </button>
+                        <p class="auth-switch-text">
+                            <span data-en="Already have an account?" data-zh="已有账户？">Already have an account?</span>
+                            <a href="#" id="showLogin" data-en="Login" data-zh="登录">Login</a>
+                        </p>
                     </div>
                 </div>
-                <h3 class="past-entries-title" data-en="Past Entries" data-zh="历史记录">Past Entries</h3>
-                <div class="past-entries" id="firelogEntries">
-                    <!-- Past fire log entries will be shown here -->
+
+                <!-- Profile Section (shown when logged in) -->
+                <div class="profile-section hidden" id="profileSection">
+                    <h2 class="profile-title" data-en="My Account" data-zh="我的账户">My Account</h2>
+
+                    <div class="profile-info">
+                        <div class="profile-item">
+                            <span class="profile-label" data-en="Username:" data-zh="用户名：">Username:</span>
+                            <span class="profile-value" id="profileUsername"></span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label" data-en="Email:" data-zh="邮箱：">Email:</span>
+                            <span class="profile-value" id="profileEmail"></span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label" data-en="Current Streak:" data-zh="当前连续：">Current Streak:</span>
+                            <span class="profile-value" id="profileStreak" data-en-template="{count} days" data-zh-template="{count} 天">0 days</span>
+                        </div>
+                        <div class="profile-item">
+                            <span class="profile-label" data-en="Best Streak:" data-zh="最佳记录：">Best Streak:</span>
+                            <span class="profile-value" id="profileBestStreak" data-en-template="{count} days" data-zh-template="{count} 天">0 days</span>
+                        </div>
+                    </div>
+
+                    <button class="auth-btn logout-btn" id="logoutBtn" data-en="Logout" data-zh="登出">
+                        <span class="auth-btn-text">Logout</span>
+                    </button>
                 </div>
             </div>
         </div>

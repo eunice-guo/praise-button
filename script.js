@@ -36,13 +36,41 @@ const translations = {
         en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         zh: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
     },
-    emptyGratitude: {
-        en: "No gratitude entries yet. Start by writing what you're grateful for today!",
-        zh: "还没有感恩记录。开始写下今天你感恩的事情吧！"
+    noFriends: {
+        en: "No friends yet. Add friends to see their streaks!",
+        zh: "还没有好友。添加好友查看他们的打卡记录！"
     },
-    emptyFirelog: {
-        en: "No achievements recorded yet. Share what you're proud of today!",
-        zh: "还没有成就记录。分享今天让你骄傲的事情！"
+    friendAdded: {
+        en: "Friend added successfully!",
+        zh: "好友添加成功！"
+    },
+    friendRemoved: {
+        en: "Friend removed.",
+        zh: "好友已删除。"
+    },
+    loginSuccess: {
+        en: "Login successful!",
+        zh: "登录成功！"
+    },
+    signupSuccess: {
+        en: "Account created successfully!",
+        zh: "账户创建成功！"
+    },
+    logoutSuccess: {
+        en: "Logged out successfully!",
+        zh: "登出成功！"
+    },
+    errorEmptyFields: {
+        en: "Please fill in all fields.",
+        zh: "请填写所有字段。"
+    },
+    errorUserExists: {
+        en: "Username already exists.",
+        zh: "用户名已存在。"
+    },
+    errorInvalidLogin: {
+        en: "Invalid username or password.",
+        zh: "用户名或密码错误。"
     }
 };
 
@@ -62,11 +90,12 @@ let currentCalendarYear = now.getFullYear();
 // Check-in history (stored as array of date strings)
 let checkInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
 
-// Gratitude entries
-let gratitudeEntries = JSON.parse(localStorage.getItem('gratitudeEntries')) || [];
+// Authentication state
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let allUsers = JSON.parse(localStorage.getItem('allUsers')) || [];
 
-// Fire log entries
-let firelogEntries = JSON.parse(localStorage.getItem('firelogEntries')) || [];
+// Friends list (stored per user)
+let friends = [];
 
 // ============= DOM ELEMENTS =============
 const button = document.querySelector('.praise-button');
@@ -88,17 +117,36 @@ const calendarGrid = document.getElementById('calendarGrid');
 const prevMonthBtn = document.getElementById('prevMonth');
 const nextMonthBtn = document.getElementById('nextMonth');
 
-// Gratitude diary elements
-const gratitudeInput = document.getElementById('gratitudeInput');
-const saveGratitudeBtn = document.getElementById('saveGratitude');
-const cancelGratitudeBtn = document.getElementById('cancelGratitude');
-const gratitudeEntriesContainer = document.getElementById('gratitudeEntries');
+// Friends elements
+const friendUsernameInput = document.getElementById('friendUsernameInput');
+const addFriendBtn = document.getElementById('addFriendBtn');
+const friendsList = document.getElementById('friendsList');
 
-// Fire log elements
-const firelogInput = document.getElementById('firelogInput');
-const saveFirelogBtn = document.getElementById('saveFirelog');
-const cancelFirelogBtn = document.getElementById('cancelFirelog');
-const firelogEntriesContainer = document.getElementById('firelogEntries');
+// Auth elements
+const authSection = document.getElementById('authSection');
+const profileSection = document.getElementById('profileSection');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const showSignupLink = document.getElementById('showSignup');
+const showLoginLink = document.getElementById('showLogin');
+
+// Login form
+const loginUsername = document.getElementById('loginUsername');
+const loginPassword = document.getElementById('loginPassword');
+const loginBtn = document.getElementById('loginBtn');
+
+// Signup form
+const signupUsername = document.getElementById('signupUsername');
+const signupEmail = document.getElementById('signupEmail');
+const signupPassword = document.getElementById('signupPassword');
+const signupBtn = document.getElementById('signupBtn');
+
+// Profile elements
+const profileUsername = document.getElementById('profileUsername');
+const profileEmail = document.getElementById('profileEmail');
+const profileStreak = document.getElementById('profileStreak');
+const profileBestStreak = document.getElementById('profileBestStreak');
+const logoutBtn = document.getElementById('logoutBtn');
 
 // ============= INITIALIZATION =============
 function init() {
@@ -146,20 +194,39 @@ function init() {
     prevMonthBtn.addEventListener('click', () => changeMonth(-1));
     nextMonthBtn.addEventListener('click', () => changeMonth(1));
 
-    // Setup event listeners - Gratitude diary
-    saveGratitudeBtn.addEventListener('click', saveGratitudeEntry);
-    cancelGratitudeBtn.addEventListener('click', () => gratitudeInput.value = '');
+    // Setup event listeners - Friends
+    addFriendBtn.addEventListener('click', addFriend);
+    friendUsernameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addFriend();
+    });
 
-    // Setup event listeners - Fire log
-    saveFirelogBtn.addEventListener('click', saveFirelogEntry);
-    cancelFirelogBtn.addEventListener('click', () => firelogInput.value = '');
+    // Setup event listeners - Auth
+    showSignupLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleAuthForms('signup');
+    });
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleAuthForms('login');
+    });
+    loginBtn.addEventListener('click', handleLogin);
+    signupBtn.addEventListener('click', handleSignup);
+    logoutBtn.addEventListener('click', handleLogout);
+
+    // Add enter key support for login
+    loginPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+
+    // Add enter key support for signup
+    signupPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSignup();
+    });
 
     // Initialize calendar
     renderCalendar();
-    
+
     // Initialize weekday labels with spans (only once)
-    // Don't call updateWeekdayLabels here as it's called on language change
-    // The HTML already has spans, so we just need to set initial text
     const weekdayDivs = document.querySelectorAll('.calendar-weekdays > div');
     weekdayDivs.forEach(div => {
         const text = div.getAttribute(`data-${currentLanguage}`);
@@ -170,13 +237,18 @@ function init() {
             }
         }
     });
-    
+
     // Initialize tab buttons with spans
     updateTabLanguage();
 
-    // Initialize diary entries
-    renderGratitudeEntries();
-    renderFirelogEntries();
+    // Initialize auth state
+    updateAuthUI();
+
+    // Load friends if logged in
+    if (currentUser) {
+        loadFriends();
+        renderFriends();
+    }
 
     console.log('Praise Machine initialized! 🎉');
 }
@@ -301,134 +373,323 @@ function createCalendarDay(dayNum, isOtherMonth, dateStr, isToday = false, isChe
     return dayEl;
 }
 
-// ============= GRATITUDE DIARY =============
-function saveGratitudeEntry() {
-    const text = gratitudeInput.value.trim();
-    if (!text) return;
-
-    const entry = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        text: text
-    };
-
-    gratitudeEntries.unshift(entry); // Add to beginning
-    localStorage.setItem('gratitudeEntries', JSON.stringify(gratitudeEntries));
-
-    gratitudeInput.value = '';
-    renderGratitudeEntries();
-}
-
-function renderGratitudeEntries() {
-    if (gratitudeEntries.length === 0) {
-        gratitudeEntriesContainer.innerHTML = `
-            <div class="empty-state">
-                ${translations.emptyGratitude[currentLanguage]}
-            </div>
-        `;
-        return;
-    }
-
-    gratitudeEntriesContainer.innerHTML = '';
-
-    gratitudeEntries.forEach(entry => {
-        const card = createEntryCard(entry, 'gratitude');
-        gratitudeEntriesContainer.appendChild(card);
-    });
-}
-
-function deleteGratitudeEntry(id) {
-    gratitudeEntries = gratitudeEntries.filter(e => e.id !== id);
-    localStorage.setItem('gratitudeEntries', JSON.stringify(gratitudeEntries));
-    renderGratitudeEntries();
-}
-
-// ============= FIRE LOG =============
-function saveFirelogEntry() {
-    const text = firelogInput.value.trim();
-    if (!text) return;
-
-    const entry = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        text: text
-    };
-
-    firelogEntries.unshift(entry); // Add to beginning
-    localStorage.setItem('firelogEntries', JSON.stringify(firelogEntries));
-
-    firelogInput.value = '';
-    renderFirelogEntries();
-}
-
-function renderFirelogEntries() {
-    if (firelogEntries.length === 0) {
-        firelogEntriesContainer.innerHTML = `
-            <div class="empty-state">
-                ${translations.emptyFirelog[currentLanguage]}
-            </div>
-        `;
-        return;
-    }
-
-    firelogEntriesContainer.innerHTML = '';
-
-    firelogEntries.forEach(entry => {
-        const card = createEntryCard(entry, 'firelog');
-        firelogEntriesContainer.appendChild(card);
-    });
-}
-
-function deleteFirelogEntry(id) {
-    firelogEntries = firelogEntries.filter(e => e.id !== id);
-    localStorage.setItem('firelogEntries', JSON.stringify(firelogEntries));
-    renderFirelogEntries();
-}
-
-// ============= SHARED ENTRY CARD =============
-function createEntryCard(entry, type) {
-    const card = document.createElement('div');
-    card.className = 'entry-card';
-
-    const date = new Date(entry.date);
-    const dateStr = formatDate(date);
-
-    card.innerHTML = `
-        <div class="entry-date">📅 ${dateStr}</div>
-        <div class="entry-text">${escapeHtml(entry.text)}</div>
-        <div class="entry-actions">
-            <button class="entry-action-btn delete" data-id="${entry.id}" data-type="${type}">
-                ${currentLanguage === 'en' ? 'Delete' : '删除'}
-            </button>
-        </div>
-    `;
-
-    // Add delete listener
-    const deleteBtn = card.querySelector('.entry-action-btn.delete');
-    deleteBtn.addEventListener('click', () => {
-        if (type === 'gratitude') {
-            deleteGratitudeEntry(entry.id);
-        } else {
-            deleteFirelogEntry(entry.id);
-        }
-    });
-
-    return card;
-}
-
-function formatDate(date) {
-    if (currentLanguage === 'en') {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+// ============= AUTHENTICATION =============
+function toggleAuthForms(form) {
+    if (form === 'signup') {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
     } else {
-        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        signupForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
     }
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+function handleLogin() {
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value.trim();
+
+    if (!username || !password) {
+        alert(translations.errorEmptyFields[currentLanguage]);
+        return;
+    }
+
+    // Find user
+    const user = allUsers.find(u => u.username === username && u.password === password);
+
+    if (!user) {
+        alert(translations.errorInvalidLogin[currentLanguage]);
+        return;
+    }
+
+    // Login successful
+    currentUser = user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+    // Load user's data
+    streakCount = currentUser.streakCount || 0;
+    bestStreak = currentUser.bestStreak || 0;
+    lastCheckInDate = currentUser.lastCheckInDate || '';
+    checkInHistory = currentUser.checkInHistory || [];
+
+    // Update localStorage with user data
+    localStorage.setItem('streakCount', streakCount.toString());
+    localStorage.setItem('bestStreak', bestStreak.toString());
+    localStorage.setItem('lastCheckInDate', lastCheckInDate);
+    localStorage.setItem('checkInHistory', JSON.stringify(checkInHistory));
+
+    // Update UI
+    checkStreakStatus();
+    updateStreakDisplay();
+    updateAuthUI();
+    loadFriends();
+    renderFriends();
+    renderCalendar();
+
+    // Clear form
+    loginUsername.value = '';
+    loginPassword.value = '';
+
+    alert(translations.loginSuccess[currentLanguage]);
+}
+
+function handleSignup() {
+    const username = signupUsername.value.trim();
+    const email = signupEmail.value.trim();
+    const password = signupPassword.value.trim();
+
+    if (!username || !email || !password) {
+        alert(translations.errorEmptyFields[currentLanguage]);
+        return;
+    }
+
+    // Check if username exists
+    if (allUsers.find(u => u.username === username)) {
+        alert(translations.errorUserExists[currentLanguage]);
+        return;
+    }
+
+    // Create new user
+    const newUser = {
+        username: username,
+        email: email,
+        password: password,
+        streakCount: 0,
+        bestStreak: 0,
+        lastCheckInDate: '',
+        checkInHistory: [],
+        friends: []
+    };
+
+    allUsers.push(newUser);
+    localStorage.setItem('allUsers', JSON.stringify(allUsers));
+
+    // Auto login
+    currentUser = newUser;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+    // Reset streak data to new user's data
+    streakCount = 0;
+    bestStreak = 0;
+    lastCheckInDate = '';
+    checkInHistory = [];
+    localStorage.setItem('streakCount', '0');
+    localStorage.setItem('bestStreak', '0');
+    localStorage.setItem('lastCheckInDate', '');
+    localStorage.setItem('checkInHistory', JSON.stringify([]));
+
+    // Update UI
+    updateStreakDisplay();
+    updateAuthUI();
+    loadFriends();
+    renderFriends();
+    renderCalendar();
+
+    // Clear form
+    signupUsername.value = '';
+    signupEmail.value = '';
+    signupPassword.value = '';
+
+    alert(translations.signupSuccess[currentLanguage]);
+}
+
+function handleLogout() {
+    if (!confirm(currentLanguage === 'en' ? 'Are you sure you want to logout?' : '确定要登出吗？')) {
+        return;
+    }
+
+    // Save current user data before logout
+    if (currentUser) {
+        currentUser.streakCount = streakCount;
+        currentUser.bestStreak = bestStreak;
+        currentUser.lastCheckInDate = lastCheckInDate;
+        currentUser.checkInHistory = checkInHistory;
+        currentUser.friends = friends;
+
+        // Update user in allUsers array
+        const userIndex = allUsers.findIndex(u => u.username === currentUser.username);
+        if (userIndex !== -1) {
+            allUsers[userIndex] = currentUser;
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+        }
+    }
+
+    // Clear current user
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+
+    // Reset to guest mode
+    streakCount = parseInt(localStorage.getItem('guestStreakCount')) || 0;
+    bestStreak = parseInt(localStorage.getItem('guestBestStreak')) || 0;
+    lastCheckInDate = localStorage.getItem('guestLastCheckInDate') || '';
+    checkInHistory = JSON.parse(localStorage.getItem('guestCheckInHistory')) || [];
+    friends = [];
+
+    // Update localStorage
+    localStorage.setItem('streakCount', streakCount.toString());
+    localStorage.setItem('bestStreak', bestStreak.toString());
+    localStorage.setItem('lastCheckInDate', lastCheckInDate);
+    localStorage.setItem('checkInHistory', JSON.stringify(checkInHistory));
+
+    // Update UI
+    checkStreakStatus();
+    updateStreakDisplay();
+    updateAuthUI();
+    renderFriends();
+    renderCalendar();
+
+    alert(translations.logoutSuccess[currentLanguage]);
+}
+
+function updateAuthUI() {
+    if (currentUser) {
+        // Show profile, hide auth forms
+        authSection.classList.add('hidden');
+        profileSection.classList.remove('hidden');
+
+        // Update profile info
+        profileUsername.textContent = currentUser.username;
+        profileEmail.textContent = currentUser.email;
+
+        const streakTemplate = profileStreak.getAttribute(`data-${currentLanguage}-template`) || '{count} days';
+        const bestTemplate = profileBestStreak.getAttribute(`data-${currentLanguage}-template`) || '{count} days';
+
+        profileStreak.textContent = streakTemplate.replace('{count}', streakCount);
+        profileBestStreak.textContent = bestTemplate.replace('{count}', bestStreak);
+    } else {
+        // Show auth forms, hide profile
+        authSection.classList.remove('hidden');
+        profileSection.classList.add('hidden');
+
+        // Show login form by default
+        loginForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+    }
+}
+
+// ============= FRIENDS MANAGEMENT =============
+function loadFriends() {
+    if (currentUser) {
+        friends = currentUser.friends || [];
+    } else {
+        friends = [];
+    }
+}
+
+function addFriend() {
+    const friendUsername = friendUsernameInput.value.trim();
+
+    if (!friendUsername) {
+        alert(translations.errorEmptyFields[currentLanguage]);
+        return;
+    }
+
+    if (!currentUser) {
+        alert(currentLanguage === 'en' ? 'Please login to add friends.' : '请先登录以添加好友。');
+        return;
+    }
+
+    if (friendUsername === currentUser.username) {
+        alert(currentLanguage === 'en' ? 'You cannot add yourself as a friend.' : '不能添加自己为好友。');
+        return;
+    }
+
+    // Check if friend exists
+    const friendUser = allUsers.find(u => u.username === friendUsername);
+    if (!friendUser) {
+        alert(currentLanguage === 'en' ? 'User not found.' : '用户不存在。');
+        return;
+    }
+
+    // Check if already friends
+    if (friends.find(f => f.username === friendUsername)) {
+        alert(currentLanguage === 'en' ? 'Already friends!' : '已经是好友了！');
+        return;
+    }
+
+    // Add friend
+    friends.push({
+        username: friendUser.username,
+        streakCount: friendUser.streakCount || 0,
+        bestStreak: friendUser.bestStreak || 0
+    });
+
+    // Save to current user and localStorage
+    currentUser.friends = friends;
+    const userIndex = allUsers.findIndex(u => u.username === currentUser.username);
+    if (userIndex !== -1) {
+        allUsers[userIndex] = currentUser;
+        localStorage.setItem('allUsers', JSON.stringify(allUsers));
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+
+    friendUsernameInput.value = '';
+    renderFriends();
+    alert(translations.friendAdded[currentLanguage]);
+}
+
+function removeFriend(friendUsername) {
+    if (!confirm(currentLanguage === 'en' ? `Remove ${friendUsername}?` : `删除好友 ${friendUsername}？`)) {
+        return;
+    }
+
+    friends = friends.filter(f => f.username !== friendUsername);
+
+    // Save to current user and localStorage
+    if (currentUser) {
+        currentUser.friends = friends;
+        const userIndex = allUsers.findIndex(u => u.username === currentUser.username);
+        if (userIndex !== -1) {
+            allUsers[userIndex] = currentUser;
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        }
+    }
+
+    renderFriends();
+    alert(translations.friendRemoved[currentLanguage]);
+}
+
+function renderFriends() {
+    if (!currentUser || friends.length === 0) {
+        friendsList.innerHTML = `
+            <div class="empty-state">
+                ${translations.noFriends[currentLanguage]}
+            </div>
+        `;
+        return;
+    }
+
+    friendsList.innerHTML = '';
+
+    friends.forEach(friend => {
+        const friendCard = document.createElement('div');
+        friendCard.className = 'friend-card';
+
+        const streakText = currentLanguage === 'en'
+            ? `${friend.streakCount} day streak 🔥`
+            : `连续 ${friend.streakCount} 天 🔥`;
+        const bestText = currentLanguage === 'en'
+            ? `Best: ${friend.bestStreak}`
+            : `最佳: ${friend.bestStreak}`;
+
+        friendCard.innerHTML = `
+            <div class="friend-info">
+                <div class="friend-name">${friend.username}</div>
+                <div class="friend-streak">${streakText} • ${bestText}</div>
+            </div>
+            <div class="friend-actions">
+                <button class="friend-action-btn remove" data-username="${friend.username}">
+                    ${currentLanguage === 'en' ? 'Remove' : '删除'}
+                </button>
+            </div>
+        `;
+
+        // Add remove listener
+        const removeBtn = friendCard.querySelector('.friend-action-btn.remove');
+        removeBtn.addEventListener('click', () => removeFriend(friend.username));
+
+        friendsList.appendChild(friendCard);
+    });
 }
 
 // ============= STREAK SYSTEM =============
@@ -655,10 +916,10 @@ function toggleLanguage() {
     applyLanguage(currentLanguage);
     updateStreakDisplay();
 
-    // Re-render calendar and diaries with new language
+    // Re-render UI components with new language
     renderCalendar();
-    renderGratitudeEntries();
-    renderFirelogEntries();
+    renderFriends();
+    updateAuthUI();
 
     // Update tab buttons
     updateTabLanguage();
@@ -684,11 +945,12 @@ function applyLanguage(lang) {
         const text = el.getAttribute(`data-${lang}`);
         if (text && !el.classList.contains('tab-btn') && !el.classList.contains('tagline-text')) {
             // For button elements, wrap text in a span
-            if (el.tagName === 'BUTTON' && el.classList.contains('diary-btn')) {
-                let btnText = el.querySelector('.diary-btn-text');
+            if (el.tagName === 'BUTTON' && (el.classList.contains('auth-btn') || el.classList.contains('friend-btn'))) {
+                let btnTextClass = el.classList.contains('auth-btn') ? 'auth-btn-text' : 'friend-btn-text';
+                let btnText = el.querySelector(`.${btnTextClass}`);
                 if (!btnText) {
                     btnText = document.createElement('span');
-                    btnText.className = 'diary-btn-text';
+                    btnText.className = btnTextClass;
                     el.appendChild(btnText);
                 }
                 btnText.textContent = text;
