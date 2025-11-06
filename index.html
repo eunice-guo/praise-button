@@ -7,34 +7,124 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Language Switch Button -->
-    <button class="lang-switch" id="langSwitch">
-        <span class="lang-option active">EN</span>
-        <span class="lang-divider">|</span>
-        <span class="lang-option">中文</span>
-    </button>
-
-    <div class="container">
-        <h1 class="tagline" data-en="get some positivity!" data-zh="来点正能量！">get some positivity!</h1>
-
-        <button class="praise-button" aria-label="Click for encouragement"></button>
-
-        <!-- Streak Display -->
-        <div class="streak-display" id="streakDisplay">
-            <div class="streak-main">
-                <span class="streak-text" data-en-template="{count} Day Streak" data-zh-template="连续打卡 {count} 天">
-                    0 Day Streak
-                </span>
-                <span class="streak-fire">🔥</span>
-            </div>
-            <div class="streak-status" id="streakStatus" data-en="Click to check in!" data-zh="点击打卡！">
-                Click to check in!
-            </div>
-            <div class="streak-best" id="streakBest" data-en-template="Best: {count} days" data-zh-template="最长记录: {count} 天">
-                Best: 0 days
-            </div>
+    <!-- Top Right Corner -->
+    <div class="top-right">
+        <button class="lang-switch" id="langSwitch">
+            <span class="lang-option active">EN</span>
+            <span class="lang-divider">|</span>
+            <span class="lang-option">中文</span>
+        </button>
+        <div class="best-record" id="bestRecord" data-en-template="Best: {count} days" data-zh-template="最长: {count} 天">
+            Best: 0 days
         </div>
     </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="button" data-en="Button" data-zh="按钮">Button</button>
+        <button class="tab-btn" data-tab="calendar" data-en="Calendar" data-zh="日历">Calendar</button>
+        <button class="tab-btn" data-tab="gratitude" data-en="Gratitude Diary" data-zh="感恩日记">Gratitude Diary</button>
+        <button class="tab-btn" data-tab="firelog" data-en="My Fire Log" data-zh="我的成就记录">My Fire Log</button>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="tab-content-wrapper">
+
+        <!-- Button Tab (Default) -->
+        <div class="tab-content active" id="button-tab">
+            <div class="container">
+                <h1 class="tagline" data-en="get some positivity!" data-zh="来点正能量！">get some positivity!</h1>
+                <button class="praise-button" aria-label="Click for encouragement"></button>
+                <div class="streak-display" id="streakDisplay">
+                    <div class="streak-main">
+                        <span class="streak-text" data-en-template="{count} Day Streak" data-zh-template="连续打卡 {count} 天">
+                            0 Day Streak
+                        </span>
+                        <span class="streak-fire">🔥</span>
+                    </div>
+                    <div class="streak-status" id="streakStatus" data-en="Click to check in!" data-zh="点击打卡！">
+                        Click to check in!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Tab -->
+        <div class="tab-content" id="calendar-tab">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="calendar-nav-btn" id="prevMonth">&lt;</button>
+                    <h2 class="calendar-title" id="calendarTitle">January 2025</h2>
+                    <button class="calendar-nav-btn" id="nextMonth">&gt;</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div data-en="Su" data-zh="日">Su</div>
+                    <div data-en="Mo" data-zh="一">Mo</div>
+                    <div data-en="Tu" data-zh="二">Tu</div>
+                    <div data-en="We" data-zh="三">We</div>
+                    <div data-en="Th" data-zh="四">Th</div>
+                    <div data-en="Fr" data-zh="五">Fr</div>
+                    <div data-en="Sa" data-zh="六">Sa</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar days will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Gratitude Diary Tab -->
+        <div class="tab-content" id="gratitude-tab">
+            <div class="diary-container">
+                <h2 class="diary-title" data-en="Gratitude Diary" data-zh="感恩日记">Gratitude Diary</h2>
+                <p class="diary-note" data-en="What are you grateful for today?" data-zh="今天你想感恩什么？">
+                    What are you grateful for today?
+                </p>
+                <div class="diary-input-section">
+                    <textarea class="diary-textarea" id="gratitudeInput"
+                              data-placeholder-en="What are you grateful for today?"
+                              data-placeholder-zh="今天你想感恩什么？"
+                              placeholder="What are you grateful for today?"
+                              rows="4"></textarea>
+                    <div class="diary-buttons">
+                        <button class="diary-btn save-btn" id="saveGratitude" data-en="Save" data-zh="保存">Save</button>
+                        <button class="diary-btn cancel-btn" id="cancelGratitude" data-en="Cancel" data-zh="取消">Cancel</button>
+                    </div>
+                </div>
+                <h3 class="past-entries-title" data-en="Past Entries" data-zh="历史记录">Past Entries</h3>
+                <div class="past-entries" id="gratitudeEntries">
+                    <!-- Past gratitude entries will be shown here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Fire Log Tab -->
+        <div class="tab-content" id="firelog-tab">
+            <div class="diary-container">
+                <h2 class="diary-title" data-en="My Fire Log" data-zh="我的成就记录">My Fire Log</h2>
+                <p class="diary-note" data-en="Record what you achieved today and what you're proud of!"
+                   data-zh="记录今天的成就和让你骄傲的事！">
+                    Record what you achieved today and what you're proud of!
+                </p>
+                <div class="diary-input-section">
+                    <textarea class="diary-textarea" id="firelogInput"
+                              data-placeholder-en="What did you achieve today? What are you proud of?"
+                              data-placeholder-zh="今天你取得了什么成就？有什么让你骄傲的？"
+                              placeholder="What did you achieve today? What are you proud of?"
+                              rows="4"></textarea>
+                    <div class="diary-buttons">
+                        <button class="diary-btn save-btn" id="saveFirelog" data-en="Save" data-zh="保存">Save</button>
+                        <button class="diary-btn cancel-btn" id="cancelFirelog" data-en="Cancel" data-zh="取消">Cancel</button>
+                    </div>
+                </div>
+                <h3 class="past-entries-title" data-en="Past Entries" data-zh="历史记录">Past Entries</h3>
+                <div class="past-entries" id="firelogEntries">
+                    <!-- Past fire log entries will be shown here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

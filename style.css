@@ -6,20 +6,29 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: Georgia, 'Times New Roman', serif;
     width: 100%;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
     /* Soft beige background */
     background: #F5E6D3;
     background-attachment: fixed;
 }
 
-/* Language Switch Button */
-.lang-switch {
+/* ============= TOP RIGHT CORNER ============= */
+.top-right {
     position: fixed;
     top: 20px;
     right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    z-index: 100;
+}
+
+/* Language Switch Button */
+.lang-switch {
     background: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -28,9 +37,9 @@ body {
     padding: 8px 16px;
     cursor: pointer;
     font-size: 14px;
+    font-family: Georgia, 'Times New Roman', serif;
     color: rgba(139, 90, 60, 0.85);
     transition: all 0.3s ease;
-    z-index: 100;
 }
 
 .lang-switch:hover {
@@ -53,15 +62,97 @@ body {
     opacity: 0.3;
 }
 
+/* Best Record Display */
+.best-record {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13px;
+    color: rgba(139, 90, 60, 0.7);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 6px 14px;
+}
+
+/* ============= NAVIGATION TABS ============= */
+.nav-tabs {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 25px;
+    padding: 12px 24px;
+}
+
+.tab-btn {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    color: rgba(139, 90, 60, 0.7);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 4px;
+    position: relative;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    color: rgba(139, 90, 60, 0.95);
+}
+
+.tab-btn.active {
+    color: rgba(139, 90, 60, 1);
+    font-weight: 600;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(139, 90, 60, 0.8);
+    border-radius: 2px;
+}
+
+/* ============= TAB CONTENT ============= */
+.tab-content-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 140px;
+}
+
+.tab-content {
+    display: none;
+    width: 100%;
+    min-height: calc(100vh - 140px);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ============= BUTTON TAB ============= */
 /* Container to center content */
 .container {
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - 140px);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 40px;
+    padding: 20px;
 }
 
 /* Tagline above button */
@@ -237,6 +328,7 @@ body {
 }
 
 .streak-text {
+    font-family: Georgia, 'Times New Roman', serif;
     font-size: 20px;
     font-weight: 600;
     color: rgba(139, 90, 60, 0.9);
@@ -253,6 +345,7 @@ body {
 }
 
 .streak-status {
+    font-family: Georgia, 'Times New Roman', serif;
     font-size: 14px;
     color: rgba(139, 90, 60, 0.7);
     margin-bottom: 4px;
@@ -263,10 +356,298 @@ body {
     font-weight: 600;
 }
 
-.streak-best {
-    font-size: 12px;
-    color: rgba(139, 90, 60, 0.5);
+/* ============= CALENDAR TAB ============= */
+.calendar-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
 }
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.calendar-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: rgba(139, 90, 60, 0.9);
+}
+
+.calendar-nav-btn {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    color: rgba(139, 90, 60, 0.85);
+    transition: all 0.3s ease;
+}
+
+.calendar-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.calendar-weekdays > div {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(139, 90, 60, 0.7);
+    padding: 10px 0;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    color: rgba(139, 90, 60, 0.85);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.calendar-day.today {
+    background: rgba(255, 200, 100, 0.2);
+    border: 2px solid rgba(255, 200, 100, 0.6);
+}
+
+.calendar-day.checked-in {
+    background: rgba(255, 200, 100, 0.15);
+}
+
+.calendar-day:hover:not(.other-month) {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.05);
+}
+
+.day-number {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.day-fire {
+    font-size: 18px;
+}
+
+/* ============= DIARY TABS (Gratitude & Fire Log) ============= */
+.diary-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.diary-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: rgba(139, 90, 60, 0.9);
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.diary-note {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    color: rgba(139, 90, 60, 0.7);
+    text-align: center;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+.diary-input-section {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 40px;
+}
+
+.diary-textarea {
+    width: 100%;
+    min-height: 120px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 15px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    color: rgba(139, 90, 60, 0.9);
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+.diary-textarea::placeholder {
+    color: rgba(139, 90, 60, 0.5);
+    font-style: italic;
+}
+
+.diary-textarea:focus {
+    outline: none;
+    border: 1px solid rgba(139, 90, 60, 0.4);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.diary-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.diary-btn {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    padding: 10px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-btn {
+    background: rgba(139, 90, 60, 0.85);
+    color: white;
+}
+
+.save-btn:hover {
+    background: rgba(139, 90, 60, 1);
+    transform: scale(1.05);
+}
+
+.cancel-btn {
+    background: rgba(255, 255, 255, 0.4);
+    color: rgba(139, 90, 60, 0.85);
+}
+
+.cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.past-entries-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(139, 90, 60, 0.85);
+    margin-bottom: 20px;
+}
+
+.past-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.entry-card {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.entry-card:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.entry-date {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(139, 90, 60, 0.9);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.entry-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    color: rgba(139, 90, 60, 0.8);
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.entry-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.entry-action-btn {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.4);
+    color: rgba(139, 90, 60, 0.85);
+    transition: all 0.3s ease;
+}
+
+.entry-action-btn:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.entry-action-btn.delete {
+    color: #d32f2f;
+}
+
+.entry-action-btn.delete:hover {
+    background: rgba(211, 47, 47, 0.1);
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(139, 90, 60, 0.6);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    font-style: italic;
+}
+
+/* ============= RESPONSIVE DESIGN ============= */
 
 /* Desktop size adjustments */
 @media screen and (min-width: 768px) {
@@ -299,8 +680,29 @@ body {
         font-size: 16px;
     }
 
-    .streak-best {
-        font-size: 14px;
+    .nav-tabs {
+        gap: 40px;
+        padding: 14px 28px;
+    }
+
+    .tab-btn {
+        font-size: 16px;
+    }
+
+    .calendar-container {
+        max-width: 700px;
+    }
+
+    .calendar-title {
+        font-size: 28px;
+    }
+
+    .diary-title {
+        font-size: 32px;
+    }
+
+    .diary-note {
+        font-size: 17px;
     }
 }
 
@@ -356,5 +758,42 @@ body {
         right: 10px;
         font-size: 12px;
         padding: 6px 12px;
+    }
+
+    .best-record {
+        font-size: 11px;
+        padding: 5px 12px;
+    }
+
+    .nav-tabs {
+        gap: 15px;
+        padding: 10px 16px;
+        top: 70px;
+    }
+
+    .tab-btn {
+        font-size: 13px;
+        padding: 6px 2px;
+    }
+
+    .calendar-grid {
+        gap: 6px;
+    }
+
+    .day-number {
+        font-size: 12px;
+    }
+
+    .day-fire {
+        font-size: 14px;
+    }
+
+    .diary-input-section {
+        padding: 18px;
+    }
+
+    .diary-textarea {
+        padding: 12px;
+        font-size: 14px;
     }
 }

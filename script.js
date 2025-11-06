@@ -31,6 +31,18 @@ const translations = {
             en: "30 days! Incredible! 🏆",
             zh: "30天成就！🏆"
         }
+    },
+    monthNames: {
+        en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        zh: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+    },
+    emptyGratitude: {
+        en: "No gratitude entries yet. Start by writing what you're grateful for today!",
+        zh: "还没有感恩记录。开始写下今天你感恩的事情吧！"
+    },
+    emptyFirelog: {
+        en: "No achievements recorded yet. Share what you're proud of today!",
+        zh: "还没有成就记录。分享今天让你骄傲的事情！"
     }
 };
 
@@ -41,6 +53,17 @@ let streakCount = parseInt(localStorage.getItem('streakCount')) || 0;
 let lastCheckInDate = localStorage.getItem('lastCheckInDate') || '';
 let bestStreak = parseInt(localStorage.getItem('bestStreak')) || 0;
 let checkedInToday = false;
+let currentCalendarMonth = new Date().getMonth();
+let currentCalendarYear = new Date().getFullYear();
+
+// Check-in history (stored as array of date strings)
+let checkInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
+
+// Gratitude entries
+let gratitudeEntries = JSON.parse(localStorage.getItem('gratitudeEntries')) || [];
+
+// Fire log entries
+let firelogEntries = JSON.parse(localStorage.getItem('firelogEntries')) || [];
 
 // ============= DOM ELEMENTS =============
 const button = document.querySelector('.praise-button');
@@ -49,7 +72,29 @@ const tagline = document.querySelector('.tagline');
 const streakText = document.querySelector('.streak-text');
 const streakFire = document.querySelector('.streak-fire');
 const streakStatus = document.getElementById('streakStatus');
-const streakBest = document.getElementById('streakBest');
+const bestRecord = document.getElementById('bestRecord');
+
+// Tab elements
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
+
+// Calendar elements
+const calendarTitle = document.getElementById('calendarTitle');
+const calendarGrid = document.getElementById('calendarGrid');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+
+// Gratitude diary elements
+const gratitudeInput = document.getElementById('gratitudeInput');
+const saveGratitudeBtn = document.getElementById('saveGratitude');
+const cancelGratitudeBtn = document.getElementById('cancelGratitude');
+const gratitudeEntriesContainer = document.getElementById('gratitudeEntries');
+
+// Fire log elements
+const firelogInput = document.getElementById('firelogInput');
+const saveFirelogBtn = document.getElementById('saveFirelog');
+const cancelFirelogBtn = document.getElementById('cancelFirelog');
+const firelogEntriesContainer = document.getElementById('firelogEntries');
 
 // ============= INITIALIZATION =============
 function init() {
@@ -62,7 +107,7 @@ function init() {
     // Update display
     updateStreakDisplay();
 
-    // Setup event listeners
+    // Setup event listeners - Button tab
     button.addEventListener('click', handleClick);
     button.addEventListener('touchend', (e) => {
         e.preventDefault();
@@ -70,7 +115,272 @@ function init() {
     });
     langSwitch.addEventListener('click', toggleLanguage);
 
+    // Setup event listeners - Tabs
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // Setup event listeners - Calendar
+    prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+    nextMonthBtn.addEventListener('click', () => changeMonth(1));
+
+    // Setup event listeners - Gratitude diary
+    saveGratitudeBtn.addEventListener('click', saveGratitudeEntry);
+    cancelGratitudeBtn.addEventListener('click', () => gratitudeInput.value = '');
+
+    // Setup event listeners - Fire log
+    saveFirelogBtn.addEventListener('click', saveFirelogEntry);
+    cancelFirelogBtn.addEventListener('click', () => firelogInput.value = '');
+
+    // Initialize calendar
+    renderCalendar();
+
+    // Initialize diary entries
+    renderGratitudeEntries();
+    renderFirelogEntries();
+
     console.log('Praise Machine initialized! 🎉');
+}
+
+// ============= TAB SWITCHING =============
+function switchTab(tabName) {
+    // Update tab buttons
+    tabButtons.forEach(btn => {
+        if (btn.dataset.tab === tabName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Update tab content
+    tabContents.forEach(content => {
+        if (content.id === `${tabName}-tab`) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+
+    // If switching to calendar, re-render it
+    if (tabName === 'calendar') {
+        renderCalendar();
+    }
+}
+
+// ============= CALENDAR FUNCTIONS =============
+function changeMonth(delta) {
+    currentCalendarMonth += delta;
+
+    if (currentCalendarMonth < 0) {
+        currentCalendarMonth = 11;
+        currentCalendarYear--;
+    } else if (currentCalendarMonth > 11) {
+        currentCalendarMonth = 0;
+        currentCalendarYear++;
+    }
+
+    renderCalendar();
+}
+
+function renderCalendar() {
+    // Update title
+    const monthName = translations.monthNames[currentLanguage][currentCalendarMonth];
+    calendarTitle.textContent = `${monthName} ${currentCalendarYear}`;
+
+    // Clear grid
+    calendarGrid.innerHTML = '';
+
+    // Get first day of month and total days
+    const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1).getDay();
+    const daysInMonth = new Date(currentCalendarYear, currentCalendarMonth + 1, 0).getDate();
+    const daysInPrevMonth = new Date(currentCalendarYear, currentCalendarMonth, 0).getDate();
+
+    const today = new Date();
+    const todayStr = getTodayDateString();
+
+    // Add previous month's trailing days
+    for (let i = firstDay - 1; i >= 0; i--) {
+        const dayNum = daysInPrevMonth - i;
+        const dayEl = createCalendarDay(dayNum, true, null);
+        calendarGrid.appendChild(dayEl);
+    }
+
+    // Add current month's days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isToday = dateStr === todayStr;
+        const isCheckedIn = checkInHistory.includes(dateStr);
+        const dayEl = createCalendarDay(day, false, dateStr, isToday, isCheckedIn);
+        calendarGrid.appendChild(dayEl);
+    }
+
+    // Add next month's leading days to complete the grid
+    const totalCells = calendarGrid.children.length;
+    const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    for (let i = 1; i <= remainingCells; i++) {
+        const dayEl = createCalendarDay(i, true, null);
+        calendarGrid.appendChild(dayEl);
+    }
+}
+
+function createCalendarDay(dayNum, isOtherMonth, dateStr, isToday = false, isCheckedIn = false) {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day';
+
+    if (isOtherMonth) {
+        dayEl.classList.add('other-month');
+    }
+    if (isToday) {
+        dayEl.classList.add('today');
+    }
+    if (isCheckedIn) {
+        dayEl.classList.add('checked-in');
+    }
+
+    const numberEl = document.createElement('div');
+    numberEl.className = 'day-number';
+    numberEl.textContent = dayNum;
+    dayEl.appendChild(numberEl);
+
+    if (isCheckedIn && !isOtherMonth) {
+        const fireEl = document.createElement('div');
+        fireEl.className = 'day-fire';
+        fireEl.textContent = '🔥';
+        dayEl.appendChild(fireEl);
+    }
+
+    return dayEl;
+}
+
+// ============= GRATITUDE DIARY =============
+function saveGratitudeEntry() {
+    const text = gratitudeInput.value.trim();
+    if (!text) return;
+
+    const entry = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        text: text
+    };
+
+    gratitudeEntries.unshift(entry); // Add to beginning
+    localStorage.setItem('gratitudeEntries', JSON.stringify(gratitudeEntries));
+
+    gratitudeInput.value = '';
+    renderGratitudeEntries();
+}
+
+function renderGratitudeEntries() {
+    if (gratitudeEntries.length === 0) {
+        gratitudeEntriesContainer.innerHTML = `
+            <div class="empty-state">
+                ${translations.emptyGratitude[currentLanguage]}
+            </div>
+        `;
+        return;
+    }
+
+    gratitudeEntriesContainer.innerHTML = '';
+
+    gratitudeEntries.forEach(entry => {
+        const card = createEntryCard(entry, 'gratitude');
+        gratitudeEntriesContainer.appendChild(card);
+    });
+}
+
+function deleteGratitudeEntry(id) {
+    gratitudeEntries = gratitudeEntries.filter(e => e.id !== id);
+    localStorage.setItem('gratitudeEntries', JSON.stringify(gratitudeEntries));
+    renderGratitudeEntries();
+}
+
+// ============= FIRE LOG =============
+function saveFirelogEntry() {
+    const text = firelogInput.value.trim();
+    if (!text) return;
+
+    const entry = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        text: text
+    };
+
+    firelogEntries.unshift(entry); // Add to beginning
+    localStorage.setItem('firelogEntries', JSON.stringify(firelogEntries));
+
+    firelogInput.value = '';
+    renderFirelogEntries();
+}
+
+function renderFirelogEntries() {
+    if (firelogEntries.length === 0) {
+        firelogEntriesContainer.innerHTML = `
+            <div class="empty-state">
+                ${translations.emptyFirelog[currentLanguage]}
+            </div>
+        `;
+        return;
+    }
+
+    firelogEntriesContainer.innerHTML = '';
+
+    firelogEntries.forEach(entry => {
+        const card = createEntryCard(entry, 'firelog');
+        firelogEntriesContainer.appendChild(card);
+    });
+}
+
+function deleteFirelogEntry(id) {
+    firelogEntries = firelogEntries.filter(e => e.id !== id);
+    localStorage.setItem('firelogEntries', JSON.stringify(firelogEntries));
+    renderFirelogEntries();
+}
+
+// ============= SHARED ENTRY CARD =============
+function createEntryCard(entry, type) {
+    const card = document.createElement('div');
+    card.className = 'entry-card';
+
+    const date = new Date(entry.date);
+    const dateStr = formatDate(date);
+
+    card.innerHTML = `
+        <div class="entry-date">📅 ${dateStr}</div>
+        <div class="entry-text">${escapeHtml(entry.text)}</div>
+        <div class="entry-actions">
+            <button class="entry-action-btn delete" data-id="${entry.id}" data-type="${type}">
+                ${currentLanguage === 'en' ? 'Delete' : '删除'}
+            </button>
+        </div>
+    `;
+
+    // Add delete listener
+    const deleteBtn = card.querySelector('.entry-action-btn.delete');
+    deleteBtn.addEventListener('click', () => {
+        if (type === 'gratitude') {
+            deleteGratitudeEntry(entry.id);
+        } else {
+            deleteFirelogEntry(entry.id);
+        }
+    });
+
+    return card;
+}
+
+function formatDate(date) {
+    if (currentLanguage === 'en') {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    } else {
+        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ============= STREAK SYSTEM =============
@@ -112,6 +422,12 @@ function performCheckIn() {
     const today = getTodayDateString();
     lastCheckInDate = today;
     checkedInToday = true;
+
+    // Add to check-in history
+    if (!checkInHistory.includes(today)) {
+        checkInHistory.push(today);
+        localStorage.setItem('checkInHistory', JSON.stringify(checkInHistory));
+    }
 
     // Update best streak
     if (streakCount > bestStreak) {
@@ -182,17 +498,11 @@ function updateStreakDisplay() {
     const template = streakText.getAttribute(`data-${currentLanguage}-template`);
     streakText.textContent = template.replace('{count}', streakCount);
 
-    // Update fire emoji
+    // Update fire emoji - ONE fire per day
     if (streakCount === 0) {
         streakFire.textContent = '';
-    } else if (streakCount <= 2) {
-        streakFire.textContent = '🔥';
-    } else if (streakCount <= 6) {
-        streakFire.textContent = '🔥🔥';
-    } else if (streakCount < 30) {
-        streakFire.textContent = '🔥🔥🔥';
     } else {
-        streakFire.textContent = '🏆';
+        streakFire.textContent = '🔥';
     }
 
     // Update status
@@ -205,8 +515,8 @@ function updateStreakDisplay() {
     }
 
     // Update best record
-    const bestTemplate = streakBest.getAttribute(`data-${currentLanguage}-template`);
-    streakBest.textContent = bestTemplate.replace('{count}', bestStreak);
+    const bestTemplate = bestRecord.getAttribute(`data-${currentLanguage}-template`);
+    bestRecord.textContent = bestTemplate.replace('{count}', bestStreak);
 }
 
 function getTodayDateString() {
@@ -247,6 +557,17 @@ function toggleLanguage() {
     localStorage.setItem('language', currentLanguage);
     applyLanguage(currentLanguage);
     updateStreakDisplay();
+
+    // Re-render calendar and diaries with new language
+    renderCalendar();
+    renderGratitudeEntries();
+    renderFirelogEntries();
+
+    // Update tab buttons
+    updateTabLanguage();
+
+    // Update weekday labels
+    updateWeekdayLabels();
 }
 
 function applyLanguage(lang) {
@@ -261,8 +582,37 @@ function applyLanguage(lang) {
         }
     });
 
-    // Update tagline
-    tagline.textContent = tagline.getAttribute(`data-${lang}`);
+    // Update all elements with data-en/data-zh attributes
+    document.querySelectorAll('[data-en]').forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text && !el.classList.contains('tab-btn')) {
+            el.textContent = text;
+        }
+    });
+
+    // Update placeholders
+    document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+        el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
+    });
+}
+
+function updateTabLanguage() {
+    tabButtons.forEach(btn => {
+        const text = btn.getAttribute(`data-${currentLanguage}`);
+        if (text) {
+            btn.textContent = text;
+        }
+    });
+}
+
+function updateWeekdayLabels() {
+    const weekdayDivs = document.querySelectorAll('.calendar-weekdays > div');
+    weekdayDivs.forEach(div => {
+        const text = div.getAttribute(`data-${currentLanguage}`);
+        if (text) {
+            div.textContent = text;
+        }
+    });
 }
 
 // ============= BUTTON CLICK HANDLER =============
