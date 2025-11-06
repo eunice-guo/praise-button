@@ -8,16 +8,11 @@
 </head>
 <body>
     <!-- Top Right Corner -->
-    <div class="top-right">
-        <button class="lang-switch" id="langSwitch">
-            <span class="lang-option active">EN</span>
-            <span class="lang-divider">|</span>
-            <span class="lang-option">中文</span>
-        </button>
-        <div class="best-record" id="bestRecord" data-en-template="Best: {count} days" data-zh-template="最长: {count} 天">
-            Best: 0 days
-        </div>
-    </div>
+    <button class="lang-switch" id="langSwitch">
+        <span class="lang-option active">EN</span>
+        <span class="lang-divider">|</span>
+        <span class="lang-option">中文</span>
+    </button>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
@@ -44,6 +39,9 @@
                     </div>
                     <div class="streak-status" id="streakStatus" data-en="Click to check in!" data-zh="点击打卡！">
                         Click to check in!
+                    </div>
+                    <div class="best-record" id="bestRecord" data-en-template="Best: {count} days" data-zh-template="最长: {count} 天">
+                        Best: 0 days
                     </div>
                 </div>
             </div>
