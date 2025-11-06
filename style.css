@@ -39,6 +39,38 @@ body {
     z-index: 100;
 }
 
+/* ============= TIMEZONE SELECTOR ============= */
+.timezone-selector {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.timezone-select {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-family: Georgia, 'Times New Roman', serif;
+    color: rgba(139, 90, 60, 0.85);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.timezone-select:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.timezone-select:focus {
+    background: rgba(255, 255, 255, 0.4);
+    border-color: rgba(139, 90, 60, 0.5);
+}
+
 .lang-switch:hover {
     background: rgba(255, 255, 255, 0.4);
     transform: scale(1.05);
@@ -69,6 +101,8 @@ body {
     gap: 40px;
     justify-content: center;
     z-index: 50;
+    height: 40px;
+    align-items: center;
 }
 
 .tab-btn {
@@ -83,7 +117,21 @@ body {
     transition: color 0.3s ease;
     white-space: nowrap;
     min-width: 80px;
+    width: auto;
     text-align: center;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    height: auto;
+}
+
+.tab-btn-text {
+    display: inline-block;
+    min-height: 20px;
+    line-height: 1.2;
+    vertical-align: middle;
 }
 
 .tab-btn:hover {
@@ -98,16 +146,20 @@ body {
     content: '';
     position: absolute;
     bottom: -4px;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     height: 2px;
     background: rgba(139, 90, 60, 0.8);
+    width: 80%;
+    min-width: 50px;
+    max-width: 120px;
 }
 
 /* ============= TAB CONTENT ============= */
 .tab-content-wrapper {
     width: 100%;
     min-height: 100vh;
+    margin-top: 110px;
 }
 
 .tab-content {
@@ -132,6 +184,7 @@ body {
     gap: 40px;
     padding: 20px;
     box-sizing: border-box;
+    margin-top: 0;
 }
 
 /* Tagline above button */
@@ -146,6 +199,16 @@ body {
     letter-spacing: 1px;
     min-width: 280px;
     width: 280px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tagline-text {
+    display: inline-block;
+    min-height: 28px;
+    line-height: 1.2;
 }
 
 /* Star particle styles */
@@ -317,6 +380,9 @@ body {
     color: rgba(139, 90, 60, 0.9);
     min-width: 180px;
     display: inline-block;
+    min-height: 24px;
+    line-height: 1.2;
+    vertical-align: middle;
 }
 
 .streak-fire {
@@ -331,11 +397,13 @@ body {
 
 .streak-status {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 14px;
+    font-size: 12px;
     color: rgba(139, 90, 60, 0.7);
     margin-bottom: 4px;
     min-width: 160px;
-    min-height: 21px;
+    min-height: 18px;
+    line-height: 1.2;
+    display: inline-block;
 }
 
 .streak-status.checked-in {
@@ -350,13 +418,16 @@ body {
     margin-top: 2px;
     min-width: 120px;
     min-height: 18px;
+    line-height: 1.2;
+    display: inline-block;
 }
 
 /* ============= CALENDAR TAB ============= */
 .calendar-container {
     max-width: 600px;
     margin: 0 auto;
-    padding: 140px 20px 40px 20px;
+    padding: 20px;
+    padding-top: 40px;
 }
 
 .calendar-header {
@@ -407,6 +478,17 @@ body {
     font-weight: 600;
     color: rgba(139, 90, 60, 0.7);
     padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 20px;
+    height: 20px;
+}
+
+.calendar-weekdays > div > span {
+    display: inline-block;
+    min-height: 18px;
+    line-height: 1.2;
 }
 
 .calendar-grid {
@@ -420,7 +502,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -431,6 +513,8 @@ body {
     color: rgba(139, 90, 60, 0.85);
     transition: all 0.3s ease;
     cursor: pointer;
+    padding-top: 8px;
+    position: relative;
 }
 
 .calendar-day.other-month {
@@ -451,20 +535,44 @@ body {
     transform: scale(1.05);
 }
 
+.day-number-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20px;
+    height: 20px;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+}
+
 .day-number {
     font-size: 14px;
-    margin-bottom: 4px;
+    text-align: center;
+    width: auto;
+    line-height: 1;
+    margin: 0;
+    display: inline-block;
+    min-width: 20px;
 }
 
 .day-fire {
     font-size: 18px;
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* ============= DIARY TABS (Gratitude & Fire Log) ============= */
 .diary-container {
     max-width: 700px;
     margin: 0 auto;
-    padding: 140px 20px 40px 20px;
+    padding: 20px;
+    padding-top: 40px;
 }
 
 .diary-title {
@@ -534,6 +642,16 @@ body {
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    min-height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.diary-btn-text {
+    display: inline-block;
+    min-height: 18px;
+    line-height: 1.2;
 }
 
 .save-btn {
@@ -743,30 +861,89 @@ body {
 
 /* iPhone and mobile devices - ensure proper fit */
 @media screen and (max-width: 480px) {
+    .timezone-selector {
+        top: 10px;
+        left: 10px;
+    }
+
+    .timezone-select {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+
+    .lang-switch {
+        top: 10px;
+        right: 10px;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .tab-content-wrapper {
+        margin-top: 110px;
+    }
+
     .container {
         gap: 30px;
-        padding: 120px 15px 20px 15px;
-        padding-top: max(120px, env(safe-area-inset-top, 0px) + 100px);
+        padding: 15px;
+        padding-top: 20px;
+        margin-top: 0;
     }
 
     .nav-tabs {
         top: 60px;
-        gap: 15px;
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
         max-width: 100%;
         padding: 0 10px;
+        width: 100%;
+        box-sizing: border-box;
+        height: 40px;
+    }
+
+    .tab-btn {
+        font-size: 12px;
+        padding: 6px 4px;
+        min-width: 0;
+        flex: 1 1 0;
+        width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* iPhone specific sizes for better proportional spacing */
+@media screen and (min-width: 375px) and (max-width: 428px) {
+    .nav-tabs {
+        gap: 6px;
+        padding: 0 12px;
+    }
+
+    .tab-btn {
+        font-size: 12px;
+        padding: 6px 6px;
+    }
+}
+
+@media screen and (min-width: 390px) and (max-width: 428px) {
+    .nav-tabs {
+        gap: 8px;
+        padding: 0 15px;
     }
 
     .tab-btn {
         font-size: 13px;
-        padding: 6px 10px;
-        min-width: 65px;
+        padding: 6px 8px;
     }
+}
 
+/* Continue mobile styles within the 480px media query */
+@media screen and (max-width: 480px) {
     .calendar-container {
-        padding: 120px 15px 30px 15px;
-        padding-top: max(120px, env(safe-area-inset-top, 0px) + 100px);
+        padding: 15px;
+        padding-top: 20px;
+        margin-top: 0;
     }
 
     .calendar-header {
@@ -803,8 +980,9 @@ body {
     }
 
     .diary-container {
-        padding: 120px 15px 30px 15px;
-        padding-top: max(120px, env(safe-area-inset-top, 0px) + 100px);
+        padding: 15px;
+        padding-top: 20px;
+        margin-top: 0;
     }
 
     .diary-title {
@@ -843,9 +1021,15 @@ body {
 
 /* Small mobile devices */
 @media screen and (max-width: 360px) {
+    .tab-content-wrapper {
+        margin-top: 105px;
+    }
+
     .container {
         gap: 25px;
-        padding: 110px 12px 20px 12px;
+        padding: 12px;
+        padding-top: 20px;
+        margin-top: 0;
     }
 
     .tagline {
@@ -885,14 +1069,17 @@ body {
     }
 
     .nav-tabs {
-        gap: 12px;
+        gap: 6px;
         top: 55px;
+        height: 38px;
     }
 
     .tab-btn {
-        font-size: 12px;
-        padding: 6px 8px;
-        min-width: 60px;
+        font-size: 11px;
+        padding: 6px 6px;
+        min-width: 0;
+        flex: 1 1 0;
+        max-width: 25%;
     }
 
     .streak-display {
@@ -904,7 +1091,9 @@ body {
     }
 
     .calendar-container {
-        padding: 110px 12px 25px 12px;
+        padding: 12px;
+        padding-top: 20px;
+        margin-top: 0;
     }
 
     .calendar-grid {
@@ -920,7 +1109,9 @@ body {
     }
 
     .diary-container {
-        padding: 110px 12px 25px 12px;
+        padding: 12px;
+        padding-top: 20px;
+        margin-top: 0;
     }
 
     .diary-input-section {
@@ -944,13 +1135,8 @@ body {
         top: max(70px, env(safe-area-inset-top) + 50px);
     }
 
-    .container {
-        padding-top: max(120px, env(safe-area-inset-top) + 100px);
-    }
-
-    .calendar-container,
-    .diary-container {
-        padding-top: max(120px, env(safe-area-inset-top) + 100px);
+    .tab-content-wrapper {
+        margin-top: max(110px, env(safe-area-inset-top) + 100px);
     }
 }
 

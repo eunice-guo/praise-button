@@ -15,13 +15,64 @@
         <span class="lang-divider">|</span>
         <span class="lang-option">中文</span>
     </button>
+    
+    <!-- Timezone Selector -->
+    <div class="timezone-selector" id="timezoneSelector">
+        <select id="timezoneSelect" class="timezone-select">
+            <option value="auto">Auto (Detect)</option>
+            <optgroup label="Americas">
+                <option value="America/New_York">Eastern Time (ET)</option>
+                <option value="America/Chicago">Central Time (CT)</option>
+                <option value="America/Denver">Mountain Time (MT)</option>
+                <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                <option value="America/Phoenix">Arizona Time (MST)</option>
+                <option value="America/Anchorage">Alaska Time (AKT)</option>
+                <option value="Pacific/Honolulu">Hawaii Time (HST)</option>
+                <option value="America/Toronto">Toronto (EST)</option>
+                <option value="America/Vancouver">Vancouver (PST)</option>
+                <option value="America/Mexico_City">Mexico City (CST)</option>
+                <option value="America/Sao_Paulo">São Paulo (BRT)</option>
+                <option value="America/Buenos_Aires">Buenos Aires (ART)</option>
+            </optgroup>
+            <optgroup label="Europe">
+                <option value="Europe/London">London (GMT)</option>
+                <option value="Europe/Paris">Paris (CET)</option>
+                <option value="Europe/Berlin">Berlin (CET)</option>
+                <option value="Europe/Rome">Rome (CET)</option>
+                <option value="Europe/Madrid">Madrid (CET)</option>
+                <option value="Europe/Moscow">Moscow (MSK)</option>
+                <option value="Europe/Athens">Athens (EET)</option>
+                <option value="Europe/Dublin">Dublin (GMT)</option>
+            </optgroup>
+            <optgroup label="Asia">
+                <option value="Asia/Shanghai">Shanghai (CST)</option>
+                <option value="Asia/Tokyo">Tokyo (JST)</option>
+                <option value="Asia/Hong_Kong">Hong Kong (HKT)</option>
+                <option value="Asia/Singapore">Singapore (SGT)</option>
+                <option value="Asia/Seoul">Seoul (KST)</option>
+                <option value="Asia/Dubai">Dubai (GST)</option>
+                <option value="Asia/Kolkata">Mumbai (IST)</option>
+                <option value="Asia/Bangkok">Bangkok (ICT)</option>
+            </optgroup>
+            <optgroup label="Oceania">
+                <option value="Australia/Sydney">Sydney (AEST)</option>
+                <option value="Australia/Melbourne">Melbourne (AEST)</option>
+                <option value="Pacific/Auckland">Auckland (NZST)</option>
+            </optgroup>
+            <optgroup label="Other">
+                <option value="UTC">UTC</option>
+                <option value="Africa/Cairo">Cairo (EET)</option>
+                <option value="Africa/Johannesburg">Johannesburg (SAST)</option>
+            </optgroup>
+        </select>
+    </div>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
-        <button class="tab-btn active" data-tab="button" data-en="Button" data-zh="按钮">Button</button>
-        <button class="tab-btn" data-tab="calendar" data-en="Calendar" data-zh="日历">Calendar</button>
-        <button class="tab-btn" data-tab="gratitude" data-en="Gratitude Diary" data-zh="感恩日记">Gratitude Diary</button>
-        <button class="tab-btn" data-tab="firelog" data-en="My Fire Log" data-zh="我的成就记录">My Fire Log</button>
+        <button class="tab-btn active" data-tab="button" data-en="Button" data-zh="按钮"><span class="tab-btn-text">Button</span></button>
+        <button class="tab-btn" data-tab="calendar" data-en="Calendar" data-zh="日历"><span class="tab-btn-text">Calendar</span></button>
+        <button class="tab-btn" data-tab="gratitude" data-en="Gratitude Diary" data-zh="感恩日记"><span class="tab-btn-text">Gratitude Diary</span></button>
+        <button class="tab-btn" data-tab="firelog" data-en="My Fire Log" data-zh="我的成就记录"><span class="tab-btn-text">My Fire Log</span></button>
     </nav>
 
     <!-- Tab Content -->
@@ -30,7 +81,7 @@
         <!-- Button Tab (Default) -->
         <div class="tab-content active" id="button-tab">
             <div class="container">
-                <h1 class="tagline" data-en="get some positivity!" data-zh="来点正能量！">get some positivity!</h1>
+                <h1 class="tagline"><span class="tagline-text" data-en="get some positivity!" data-zh="来点正能量！">get some positivity!</span></h1>
                 <button class="praise-button" aria-label="Click for encouragement"></button>
                 <div class="streak-display" id="streakDisplay">
                     <div class="streak-main">
@@ -54,17 +105,17 @@
             <div class="calendar-container">
                 <div class="calendar-header">
                     <button class="calendar-nav-btn" id="prevMonth">&lt;</button>
-                    <h2 class="calendar-title" id="calendarTitle">January 2025</h2>
+                    <h2 class="calendar-title" id="calendarTitle"></h2>
                     <button class="calendar-nav-btn" id="nextMonth">&gt;</button>
                 </div>
                 <div class="calendar-weekdays">
-                    <div data-en="Su" data-zh="日">Su</div>
-                    <div data-en="Mo" data-zh="一">Mo</div>
-                    <div data-en="Tu" data-zh="二">Tu</div>
-                    <div data-en="We" data-zh="三">We</div>
-                    <div data-en="Th" data-zh="四">Th</div>
-                    <div data-en="Fr" data-zh="五">Fr</div>
-                    <div data-en="Sa" data-zh="六">Sa</div>
+                    <div data-en="Su" data-zh="日"><span>Su</span></div>
+                    <div data-en="Mo" data-zh="一"><span>Mo</span></div>
+                    <div data-en="Tu" data-zh="二"><span>Tu</span></div>
+                    <div data-en="We" data-zh="三"><span>We</span></div>
+                    <div data-en="Th" data-zh="四"><span>Th</span></div>
+                    <div data-en="Fr" data-zh="五"><span>Fr</span></div>
+                    <div data-en="Sa" data-zh="六"><span>Sa</span></div>
                 </div>
                 <div class="calendar-grid" id="calendarGrid">
                     <!-- Calendar days will be generated here -->
@@ -86,8 +137,8 @@
                               placeholder="What are you grateful for today?"
                               rows="4"></textarea>
                     <div class="diary-buttons">
-                        <button class="diary-btn save-btn" id="saveGratitude" data-en="Save" data-zh="保存">Save</button>
-                        <button class="diary-btn cancel-btn" id="cancelGratitude" data-en="Cancel" data-zh="取消">Cancel</button>
+                        <button class="diary-btn save-btn" id="saveGratitude" data-en="Save" data-zh="保存"><span class="diary-btn-text">Save</span></button>
+                        <button class="diary-btn cancel-btn" id="cancelGratitude" data-en="Cancel" data-zh="取消"><span class="diary-btn-text">Cancel</span></button>
                     </div>
                 </div>
                 <h3 class="past-entries-title" data-en="Past Entries" data-zh="历史记录">Past Entries</h3>
@@ -112,8 +163,8 @@
                               placeholder="What did you achieve today? What are you proud of?"
                               rows="4"></textarea>
                     <div class="diary-buttons">
-                        <button class="diary-btn save-btn" id="saveFirelog" data-en="Save" data-zh="保存">Save</button>
-                        <button class="diary-btn cancel-btn" id="cancelFirelog" data-en="Cancel" data-zh="取消">Cancel</button>
+                        <button class="diary-btn save-btn" id="saveFirelog" data-en="Save" data-zh="保存"><span class="diary-btn-text">Save</span></button>
+                        <button class="diary-btn cancel-btn" id="cancelFirelog" data-en="Cancel" data-zh="取消"><span class="diary-btn-text">Cancel</span></button>
                     </div>
                 </div>
                 <h3 class="past-entries-title" data-en="Past Entries" data-zh="历史记录">Past Entries</h3>

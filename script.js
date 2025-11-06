@@ -49,12 +49,15 @@ const translations = {
 // ============= STATE =============
 let lastPlayedIndex = -1;
 let currentLanguage = localStorage.getItem('language') || 'en';
+let userTimezone = localStorage.getItem('timezone') || Intl.DateTimeFormat().resolvedOptions().timeZone;
 let streakCount = parseInt(localStorage.getItem('streakCount')) || 0;
 let lastCheckInDate = localStorage.getItem('lastCheckInDate') || '';
 let bestStreak = parseInt(localStorage.getItem('bestStreak')) || 0;
 let checkedInToday = false;
-let currentCalendarMonth = new Date().getMonth();
-let currentCalendarYear = new Date().getFullYear();
+// Initialize calendar to current month/year in local timezone
+const now = new Date();
+let currentCalendarMonth = now.getMonth();
+let currentCalendarYear = now.getFullYear();
 
 // Check-in history (stored as array of date strings)
 let checkInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
@@ -68,6 +71,7 @@ let firelogEntries = JSON.parse(localStorage.getItem('firelogEntries')) || [];
 // ============= DOM ELEMENTS =============
 const button = document.querySelector('.praise-button');
 const langSwitch = document.getElementById('langSwitch');
+const timezoneSelect = document.getElementById('timezoneSelect');
 const tagline = document.querySelector('.tagline');
 const streakText = document.querySelector('.streak-text');
 const streakFire = document.querySelector('.streak-fire');
@@ -114,6 +118,24 @@ function init() {
         handleClick();
     });
     langSwitch.addEventListener('click', toggleLanguage);
+    
+    // Setup timezone selector
+    if (timezoneSelect) {
+        // Set saved timezone or detect
+        const savedTimezone = localStorage.getItem('timezone');
+        if (savedTimezone) {
+            timezoneSelect.value = savedTimezone;
+        } else {
+            // Try to detect EST
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tz.includes('New_York') || tz.includes('Eastern')) {
+                timezoneSelect.value = 'America/New_York';
+            } else {
+                timezoneSelect.value = 'auto';
+            }
+        }
+        timezoneSelect.addEventListener('change', handleTimezoneChange);
+    }
 
     // Setup event listeners - Tabs
     tabButtons.forEach(btn => {
@@ -134,6 +156,12 @@ function init() {
 
     // Initialize calendar
     renderCalendar();
+    
+    // Initialize weekday labels with spans
+    updateWeekdayLabels();
+    
+    // Initialize tab buttons with spans
+    updateTabLanguage();
 
     // Initialize diary entries
     renderGratitudeEntries();
@@ -184,6 +212,9 @@ function changeMonth(delta) {
 }
 
 function renderCalendar() {
+    // Refresh check-in history from localStorage to ensure we have the latest data
+    checkInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
+
     // Update title
     const monthName = translations.monthNames[currentLanguage][currentCalendarMonth];
     calendarTitle.textContent = `${monthName} ${currentCalendarYear}`;
@@ -191,11 +222,12 @@ function renderCalendar() {
     // Clear grid
     calendarGrid.innerHTML = '';
 
-    // Get first day of month and total days
+    // Get first day of month and total days (using local timezone)
     const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1).getDay();
     const daysInMonth = new Date(currentCalendarYear, currentCalendarMonth + 1, 0).getDate();
     const daysInPrevMonth = new Date(currentCalendarYear, currentCalendarMonth, 0).getDate();
 
+    // Get today's date in local timezone
     const today = new Date();
     const todayStr = getTodayDateString();
 
@@ -208,7 +240,7 @@ function renderCalendar() {
 
     // Add current month's days
     for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dateStr = getDateInTimezone(currentCalendarYear, currentCalendarMonth, day);
         const isToday = dateStr === todayStr;
         const isCheckedIn = checkInHistory.includes(dateStr);
         const dayEl = createCalendarDay(day, false, dateStr, isToday, isCheckedIn);
@@ -238,10 +270,15 @@ function createCalendarDay(dayNum, isOtherMonth, dateStr, isToday = false, isChe
         dayEl.classList.add('checked-in');
     }
 
+    // Create a wrapper for day number to ensure it stays in place
+    const numberWrapper = document.createElement('div');
+    numberWrapper.className = 'day-number-wrapper';
+    
     const numberEl = document.createElement('div');
     numberEl.className = 'day-number';
     numberEl.textContent = dayNum;
-    dayEl.appendChild(numberEl);
+    numberWrapper.appendChild(numberEl);
+    dayEl.appendChild(numberWrapper);
 
     if (isCheckedIn && !isOtherMonth) {
         const fireEl = document.createElement('div');
@@ -442,6 +479,12 @@ function performCheckIn() {
     // Update display
     updateStreakDisplay();
 
+    // Re-render calendar if calendar tab is active
+    const calendarTab = document.getElementById('calendar-tab');
+    if (calendarTab && calendarTab.classList.contains('active')) {
+        renderCalendar();
+    }
+
     // Check for milestones
     checkMilestone();
 }
@@ -494,7 +537,7 @@ function showMilestoneMessage(message) {
 }
 
 function updateStreakDisplay() {
-    // Update streak count
+    // Update streak count - ensure text is wrapped
     const template = streakText.getAttribute(`data-${currentLanguage}-template`);
     streakText.textContent = template.replace('{count}', streakCount);
 
@@ -505,7 +548,7 @@ function updateStreakDisplay() {
         streakFire.textContent = '🔥';
     }
 
-    // Update status
+    // Update status - ensure text is wrapped
     if (checkedInToday) {
         streakStatus.textContent = translations.checkedIn[currentLanguage];
         streakStatus.classList.add('checked-in');
@@ -514,14 +557,57 @@ function updateStreakDisplay() {
         streakStatus.classList.remove('checked-in');
     }
 
-    // Update best record
+    // Update best record - ensure text is wrapped
     const bestTemplate = bestRecord.getAttribute(`data-${currentLanguage}-template`);
     bestRecord.textContent = bestTemplate.replace('{count}', bestStreak);
 }
 
 function getTodayDateString() {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // YYYY-MM-DD
+    // Get date in selected timezone
+    const timezone = timezoneSelect ? timezoneSelect.value : 'auto';
+    
+    if (timezone === 'auto' || !timezone) {
+        // Use local timezone
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    } else {
+        // Use selected timezone
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: timezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        const parts = formatter.formatToParts(now);
+        const year = parts.find(p => p.type === 'year').value;
+        const month = parts.find(p => p.type === 'month').value;
+        const day = parts.find(p => p.type === 'day').value;
+        return `${year}-${month}-${day}`;
+    }
+}
+
+function handleTimezoneChange() {
+    const selectedTimezone = timezoneSelect.value;
+    localStorage.setItem('timezone', selectedTimezone);
+    userTimezone = selectedTimezone;
+    
+    // Re-render calendar and update streak status with new timezone
+    checkStreakStatus();
+    updateStreakDisplay();
+    renderCalendar();
+}
+
+function getDateInTimezone(year, month, day) {
+    // Create date in user's local timezone
+    const date = new Date(year, month, day);
+    const yearStr = date.getFullYear();
+    const monthStr = String(date.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(date.getDate()).padStart(2, '0');
+    return `${yearStr}-${monthStr}-${dayStr}`;
 }
 
 // ============= CONFETTI ANIMATION =============
@@ -585,7 +671,20 @@ function applyLanguage(lang) {
     // Update all elements with data-en/data-zh attributes
     document.querySelectorAll('[data-en]').forEach(el => {
         const text = el.getAttribute(`data-${lang}`);
-        if (text && !el.classList.contains('tab-btn')) {
+        if (text && !el.classList.contains('tab-btn') && !el.classList.contains('tagline-text')) {
+            // For button elements, wrap text in a span
+            if (el.tagName === 'BUTTON' && el.classList.contains('diary-btn')) {
+                let btnText = el.querySelector('.diary-btn-text');
+                if (!btnText) {
+                    btnText = document.createElement('span');
+                    btnText.className = 'diary-btn-text';
+                    el.appendChild(btnText);
+                }
+                btnText.textContent = text;
+            } else {
+                el.textContent = text;
+            }
+        } else if (text && el.classList.contains('tagline-text')) {
             el.textContent = text;
         }
     });
@@ -600,7 +699,14 @@ function updateTabLanguage() {
     tabButtons.forEach(btn => {
         const text = btn.getAttribute(`data-${currentLanguage}`);
         if (text) {
-            btn.textContent = text;
+            // Wrap text in a span to maintain consistent sizing
+            let textSpan = btn.querySelector('.tab-btn-text');
+            if (!textSpan) {
+                textSpan = document.createElement('span');
+                textSpan.className = 'tab-btn-text';
+                btn.appendChild(textSpan);
+            }
+            textSpan.textContent = text;
         }
     });
 }
@@ -610,7 +716,13 @@ function updateWeekdayLabels() {
     weekdayDivs.forEach(div => {
         const text = div.getAttribute(`data-${currentLanguage}`);
         if (text) {
-            div.textContent = text;
+            // Wrap text in a span to maintain consistent sizing
+            let textSpan = div.querySelector('span');
+            if (!textSpan) {
+                textSpan = document.createElement('span');
+                div.appendChild(textSpan);
+            }
+            textSpan.textContent = text;
         }
     });
 }
