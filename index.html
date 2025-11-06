@@ -7,9 +7,33 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Language Switch Button -->
+    <button class="lang-switch" id="langSwitch">
+        <span class="lang-option active">EN</span>
+        <span class="lang-divider">|</span>
+        <span class="lang-option">中文</span>
+    </button>
+
     <div class="container">
-        <h1 class="tagline">get some positivity!</h1>
+        <h1 class="tagline" data-en="get some positivity!" data-zh="来点正能量！">get some positivity!</h1>
+
         <button class="praise-button" aria-label="Click for encouragement"></button>
+
+        <!-- Streak Display -->
+        <div class="streak-display" id="streakDisplay">
+            <div class="streak-main">
+                <span class="streak-text" data-en-template="{count} Day Streak" data-zh-template="连续打卡 {count} 天">
+                    0 Day Streak
+                </span>
+                <span class="streak-fire">🔥</span>
+            </div>
+            <div class="streak-status" id="streakStatus" data-en="Click to check in!" data-zh="点击打卡！">
+                Click to check in!
+            </div>
+            <div class="streak-best" id="streakBest" data-en-template="Best: {count} days" data-zh-template="最长记录: {count} 天">
+                Best: 0 days
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

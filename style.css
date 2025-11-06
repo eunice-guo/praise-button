@@ -15,6 +15,44 @@ body {
     background-attachment: fixed;
 }
 
+/* Language Switch Button */
+.lang-switch {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(139, 90, 60, 0.85);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.lang-switch:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.lang-option {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.lang-option.active {
+    opacity: 1;
+    font-weight: 600;
+}
+
+.lang-divider {
+    margin: 0 8px;
+    opacity: 0.3;
+}
+
 /* Container to center content */
 .container {
     width: 100%;
@@ -23,10 +61,10 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 60px;
+    gap: 40px;
 }
 
-/* Tagline above button - smaller size */
+/* Tagline above button */
 .tagline {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 24px;
@@ -70,6 +108,27 @@ body {
     }
 }
 
+/* Confetti particle styles */
+.confetti-particle {
+    position: fixed;
+    font-size: 24px;
+    pointer-events: none;
+    z-index: 1000;
+    animation: confetti-fall 3s ease-out forwards;
+}
+
+/* Confetti falling animation */
+@keyframes confetti-fall {
+    0% {
+        opacity: 1;
+        transform: translateY(-100px) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100vh) rotate(720deg);
+    }
+}
+
 /* Floating animation for button */
 @keyframes float {
     0%, 100% {
@@ -90,7 +149,7 @@ body {
     /* Glassmorphism effect */
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    -webkit-backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 255, 255, 0.5);
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.08),
@@ -124,7 +183,7 @@ body {
             inset 0 0 20px rgba(255, 255, 255, 0.5),
             0 0 30px rgba(255, 255, 255, 0.3);
         transform: translateY(-12px) scale(1.02);
-        animation: none; /* Stop float on hover */
+        animation: none;
     }
 }
 
@@ -163,10 +222,56 @@ body {
     animation: glow-pulse 0.6s ease-out;
 }
 
+/* Streak Display */
+.streak-display {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.streak-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.streak-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(139, 90, 60, 0.9);
+}
+
+.streak-fire {
+    font-size: 24px;
+    animation: fire-flicker 1.5s ease-in-out infinite;
+}
+
+@keyframes fire-flicker {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.streak-status {
+    font-size: 14px;
+    color: rgba(139, 90, 60, 0.7);
+    margin-bottom: 4px;
+}
+
+.streak-status.checked-in {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.streak-best {
+    font-size: 12px;
+    color: rgba(139, 90, 60, 0.5);
+}
+
 /* Desktop size adjustments */
 @media screen and (min-width: 768px) {
     .container {
-        gap: 80px;
+        gap: 50px;
     }
 
     .tagline {
@@ -181,12 +286,28 @@ body {
     .star-particle {
         font-size: 24px;
     }
+
+    .streak-text {
+        font-size: 24px;
+    }
+
+    .streak-fire {
+        font-size: 28px;
+    }
+
+    .streak-status {
+        font-size: 16px;
+    }
+
+    .streak-best {
+        font-size: 14px;
+    }
 }
 
 /* Larger desktop screens */
 @media screen and (min-width: 1024px) {
     .container {
-        gap: 100px;
+        gap: 60px;
     }
 
     .tagline {
@@ -206,7 +327,7 @@ body {
 /* Small mobile devices */
 @media screen and (max-width: 360px) {
     .container {
-        gap: 50px;
+        gap: 30px;
     }
 
     .tagline {
@@ -220,5 +341,20 @@ body {
 
     .star-particle {
         font-size: 18px;
+    }
+
+    .streak-text {
+        font-size: 18px;
+    }
+
+    .streak-fire {
+        font-size: 22px;
+    }
+
+    .lang-switch {
+        top: 10px;
+        right: 10px;
+        font-size: 12px;
+        padding: 6px 12px;
     }
 }
