@@ -194,6 +194,16 @@ body {
     overflow: hidden;
 }
 
+/* Hide button tab content when not active */
+#button-tab:not(.active) {
+    display: none !important;
+}
+
+#button-tab:not(.active) .container {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 /* ============= BUTTON TAB ============= */
 /* Container to center content */
 .container {
